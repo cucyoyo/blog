@@ -2,15 +2,15 @@
   <div>
     <div v-for="i in 10" class="thumbnail">
       <!--<div>-->
-        <img src=".././assets/img/2.jpg" alt="banner图" >
+        <img src=".././assets/img/55.png" alt="banner图" >
       <!--</div>-->
       <div class="caption">
         <h3>博客标题</h3>
-        <p class="info">信息sf  </p>
+        <p class="info">信息 </p>
         <p class="des">文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述 </p>
         <p class="foot">
           <span v-for="k in 3" class="pull-left tag">#标签</span>
-          <router-link :to="{name:'index'}" class="pull-right link">继续阅读 >></router-link>
+          <router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>
         </p>
         <div class="clearfix"></div>
         <!--<p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
@@ -27,6 +27,11 @@
 
 <style lang="less" scoped>
 .thumbnail {
+  width: 100%;
+  img {
+    min-width: 100%;
+    /*max-width: 100%;*/
+  }
   .caption {
     .info {
       /*line-height: 30px;*/
