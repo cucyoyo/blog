@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.bootcss.com/element-ui/2.4.0/theme-chalk/index.css" rel="stylesheet">
     </head>
     <body>
         <div class="container" id="app">
@@ -36,8 +37,21 @@
                 </div>
 
                 <input type="text" class="form-control" v-model="newPostTitle" placeholder="标题" />
+                <el-upload
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        list-type="picture-card"
+                        :on-preview="handlePictureCardPreview"
+                        :on-remove="handleRemove">
+                    <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+
+                <textarea  class="form-control" style="height: 60px" placeholder="描述，可以复制博文的第一段内容作为描述"></textarea>
                 <textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>
                 <button type="button" class="btn btn-primary" @click="newPost">发布</button>
+                <el-button>jsl</el-button>
             </div>
         </div>
 
@@ -46,7 +60,9 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
 
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+        <script src="https://cdn.bootcss.com/element-ui/2.4.0/index.js"></script>
 
         <script src="js/admin.js"></script>
     </body>

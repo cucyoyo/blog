@@ -43,7 +43,9 @@ var app = new Vue({
         newPostTitle: "",
         newPostContent: "",
         posts: [],
-        editingPost: null
+        editingPost: null,
+        dialogImageUrl: '', // 图像上传相关
+        dialogVisible: false // 图像上传相关
     },
     mounted: function(){
         var self = this
@@ -136,6 +138,13 @@ var app = new Vue({
                     alert("删除文章失败")
                 })
             }
+        },
+        handleRemove(file, fileList) { //处理图像上传过程中的删除
+            console.log(file, fileList);
+        },
+        handlePictureCardPreview(file) {
+            this.dialogImageUrl = file.url;
+            this.dialogVisible = true; // 处理图像上传过程中的预览
         }
     }
 })
