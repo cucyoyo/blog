@@ -28,7 +28,7 @@ const adminAuthenticationMiddleware = require('./middlewares/adminAuthentication
 
 
 // Run migration one time
-// require('./database/migration')(db)
+require('./database/migration')(db)
 
 // Create our first user
 User.make(driver, [null, 'admin', sha512(config.adminPassword), 'admin'], (result) => {
