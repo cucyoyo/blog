@@ -3,8 +3,12 @@
     <head>
         <title>Administration</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <!--<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.bootcss.com/element-ui/2.4.0/theme-chalk/index.css" rel="stylesheet">
+        <link rel="stylesheet" href="./image-cropper/dist/cropper.css">
+        <link rel="stylesheet" href="./image-cropper/cropper.css">
     </head>
     <body>
         <div class="container" id="app">
@@ -23,31 +27,120 @@
                 </form>
             </div>
             <div v-if="authToken">
+
+                <!----------标签管理----------->
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    添加或删除标签
+                </button>
+                <!--<div class="collapse" id="collapseExample">-->
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                        <div>
+                            <el-select v-model="value4" clearable placeholder="请选择要添加或删除的标签">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                            <el-button>添加</el-button>
+                            <el-button type="danger">删除</el-button>
+                        </div>
+                    </div>
+                </div>
+                <!----------end-标签管理----------->
                 <hr>
+
+                <!-------全部博文----------->
                 <b>全部博文</b>
+
                 <ul>
                     <li v-for="post in posts">{{ post.title }} <button class="btn btn-light" @click="editingPost = post">编辑</button> <button class="btn btn-danger" @click="deletePost(post.id)">删除</button></li>
                 </ul>
-                
+                <!--------- end - 全部博文-->
+
+                <!-----------编辑-->
                 <div v-if="editingPost">
                     <input type="text" class="form-control" v-model="editingPost.title" placeholder="标题" />
                     <textarea v-model="editingPost.content" class="form-control" style="height: 200px" placeholder="内容"></textarea>
                     <button type="button" class="btn btn-primary" @click="savePost">保存</button>
                 </div>
+                <!-----------end -编辑-->
 
+                <!---------------添加-->
                 <input type="text" class="form-control" v-model="newPostTitle" placeholder="标题" />
+
+                <!----------------图片剪裁-->
+                <form method="post" action="#" enctype="multipart/form-data">
+                    <p>
+                        <button class="btn-upload btn-lg">Select</button>
+                        <input type="file" name="avatar" id="cropper-input"/>
+                        Support formats: JPG, PNG
+                    </p>
+                    <div class="preview-container">
+                        <div class="image-container target" id="cropper-target">
+                            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+                        </div>
+                        <div class="large-wrapper">
+                            <div class="image-container large" id="preview-large">
+                                <div class="image-wrapper">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+                                </div>
+                            </div>
+                            <p>Large</p>
+                        </div>
+                        <div>
+                            <div class="image-container medium" id="preview-medium">
+                                <div class="image-wrapper">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+                                </div>
+                            </div>
+                            <p>Medium</p>
+                            <div class="image-container small" id="preview-small">
+                                <div class="image-wrapper">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+                                </div>
+                            </div>
+                            <p>Small</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="x" value="{{cropContext.left}}"/>
+                    <input type="hidden" name="y" value="{{cropContext.top}}"/>
+                    <input type="hidden" name="w" value="{{cropContext.width}}"/>
+                    <input type="hidden" name="h" value="{{cropContext.height}}"/>
+                </form>
+                <!------------end - 图片剪裁-->
+
+                <el-select v-model="value5" multiple placeholder="请选择标签">
+                    <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+
                 <textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>
                 <button type="button" class="btn btn-primary" @click="newPost">发布</button>
+                <!------------- end - 添加-->
             </div>
+
         </div>
 
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <!--<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+        <script src="https://cdn.bootcss.com/element-ui/2.4.0/index.js"></script>
+        <script src="./image-cropper/dist/cropper.js"></script>
+        <script src="./image-cropper/cropper.js"></script>
 
         <script src="js/admin.js"></script>
+        <!--@import VueCropper from "../../node_modules/vue-cropper"-->
     </body>
 </html>
