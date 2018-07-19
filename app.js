@@ -28,7 +28,7 @@ const adminAuthenticationMiddleware = require('./middlewares/adminAuthentication
 
 
 // Run migration one time
-require('./database/migration')(db)
+// require('./database/migration')(db)
 
 // Create our first user
 User.make(driver, [null, 'admin', sha512(config.adminPassword), 'admin'], (result) => {
@@ -98,7 +98,9 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
         res.send('bad request')
     }
 })
-
+apiRouter.post('/postImage', (req, res) => {
+    console.log(req)
+})
 /**
  * Route to get all posts
  */

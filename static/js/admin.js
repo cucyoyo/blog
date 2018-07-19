@@ -65,7 +65,10 @@ var app = new Vue({
       label: '北京烤鸭'
     }],
     value5: [],
-    value4: ''
+    value4: '',
+    cropper: null,
+    img_url: '',
+    rect: null,
   },
   mounted: function () {
     var self = this
@@ -78,8 +81,10 @@ var app = new Vue({
     this.loadAllPosts()
 
     // -----图片剪裁功能
-    this.$nextTick(function () {
-      var cropper = new Cropper({
+    // this.$nextTick(function () {
+    // });
+    setTimeout(function () {
+      self.cropper = new Cropper({
         aspectRatio: 'auto',
         element: document.getElementById('cropper-target'),
         previews: [
@@ -87,19 +92,20 @@ var app = new Vue({
           document.getElementById('preview-medium'),
           document.getElementById('preview-small')
         ],
-        onCroppedRectChange: function(rect) {
+        onCroppedRectChange: function (rect) {
           console.log(rect);
+          self.rect = rect;
         }
       });
       var input = document.getElementById('cropper-input');
-      console.log(input);
-      console.log(input);
 
-      input.onchange = function() {
+
+      input.onchange = function () {
         if (typeof FileReader !== 'undefined') {
           var reader = new FileReader();
           reader.onload = function (event) {
-            cropper.setImage(event.target.result);
+            self.img_url = event.target.result
+            self.cropper.setImage(event.target.result);
           };
           if (input.files && input.files[0]) {
             reader.readAsDataURL(input.files[0]);
@@ -109,10 +115,13 @@ var app = new Vue({
           input.blur();
 
           var src = document.selection.createRange().text;
-          cropper.setImage(src);
+          self.img_url = src;
+          self.cropper.setImage(src);
+
+
         }
       };
-    });
+    }, 1000)
 
     // -----end - 图片剪裁功能
 
@@ -121,13 +130,6 @@ var app = new Vue({
     /**
      * Attempt a login
      */
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
     login: function () {
       var self = this
       axios.post("/api/v1/login", {
