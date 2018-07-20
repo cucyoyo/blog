@@ -190,6 +190,22 @@ var app = new Vue({
         alert("保存文章失败")
       })
     },
+    imgPost: function () {
+      var self = this
+      axios.post("/api/v1/imgPost", {
+        img_url: this.img_url,
+        rect: this.rect
+      }, {
+        headers: {'token': this.authToken}
+      }).then(function (data) {
+        console.log(data);
+        // alert("图片上传成功")
+
+      }).catch(function (e) {
+        console.log(e);
+        // alert("图片上传失败")
+      })
+    },
     /**
      * Delete a blog post
      */

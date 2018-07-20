@@ -25,3 +25,40 @@
 - npm i
 - npm run dev
 - 打开127.0.0.1:8080查看效果
+
+### 依赖
+- 图片剪裁：[ElemeFE image-cropper](http://elemefe.github.io/image-cropper/)
+- 图片处理：[gm](http://aheckmann.github.io/gm/docs.html)
+  - 重要步骤：1.安装软件 windows下注意ImageMagick安装过程中有一个选项`install legacy (or older) utilities`要勾选，否则会报错command failed（无法执行命令）
+    2. npm install gm --save
+    3. app.js中`let gm = require('gm').subClass({imageMagick: true});`
+    4. 剪裁并保存：
+  - gm环境安装
+    - First download and install [GraphicsMagick](http://www.graphicsmagick.org/) or [ImageMagick](http://www.imagemagick.org/).
+    In Mac OS X, you can simply use Homebrew and do:
+    `brew install imagemagick`
+    `brew install graphicsmagick`
+
+    - If you want WebP support with ImageMagick, you must add the WebP option:
+    `brew install imagemagick --with-webp`
+
+    - then either use npm:
+    `npm install gm --save`
+
+    - or clone the repo:
+    `git clone git://github.com/aheckmann/gm.git`
+
+  - ubuntu安装方法可能在这里有解决：https://stackoverflow.com/questions/48557587/gm-node-js-cant-resize-images-of-large-filesize
+- 富文本编辑器 [一款轻便的富文本编辑器---Quill](https://quilljs.com) | [简单示例](https://blog.csdn.net/St_Sp_En/article/details/79103754)
+### 问题记录
+
+- 解决不能上传过大图片的问题：413 (payload too large)(要加在app使用的最开始，加到中间发现不生效)
+```
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+```
+```
+apiRouter.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
+apiRouter.use(bodyParser.json({limit: '50mb'}))
+```
+

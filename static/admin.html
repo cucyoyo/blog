@@ -10,6 +10,9 @@
   <link rel="stylesheet" href="./image-cropper/dist/cropper.css">
   <link rel="stylesheet" href="./image-cropper/cropper.css">
   <script type="text/javascript" src="./image-cropper/dist/cropper.js"></script>
+  <!--富文本编辑器-->
+  <link href="https://cdn.bootcss.com/quill/1.3.6/quill.snow.min.css" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/quill/1.3.6/quill.bubble.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" id="app">
@@ -71,7 +74,7 @@
     <input type="text" class="form-control" v-model="newPostTitle" placeholder="标题" />
 
     <!----------------图片剪裁-->
-    <form method="post" action="/api/v1/postImage" enctype="multipart/form-data">
+    <div class="form">
       <p>
         <button class="btn-upload btn-lg">选择图片</button>
         <input type="file" name="avatar" id="cropper-input"/>
@@ -110,9 +113,9 @@
       <input type="hidden" name="w" value="{{cropContext.width}}"/>
       <input type="hidden" name="h" value="{{cropContext.height}}"/>
       <input type="text" name="url" value="{{cropContext.height}}"/>
-      <button type="submit">上传</button>
+      <button @click="imgPost()" type="submit">上传</button>
       <!--<button class="btn btn-primary">上传</button>-->
-    </form>
+    </div>
     <!------------end - 图片剪裁-->
 
     <el-select v-model="value5" multiple placeholder="请选择标签">
@@ -125,6 +128,9 @@
     </el-select>
 
     <textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>
+
+
+
     <button type="button" class="btn btn-primary" @click="newPost">发布</button>
     <!------------- end - 添加-->
   </div>
@@ -140,7 +146,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
 <script src="https://cdn.bootcss.com/element-ui/2.4.0/index.js"></script>
 
-<!--<script src="./image-cropper/cropper.js"></script>-->
+<!--富文本编辑器-->
+<script src="https://cdn.bootcss.com/quill/1.3.6/quill.js"></script>
 
 <script src="js/admin.js"></script>
 <!--@import VueCropper from "../../node_modules/vue-cropper"-->
