@@ -11,8 +11,6 @@ const uuidv4 = require('uuid/v4')
 
 // Initialize API router
 let apiRouter = express.Router()
-// apiRouter.use(bodyParser.urlencoded({limit: '50mb', extended: false}))
-// apiRouter.use(bodyParser.json({limit: '50mb'}))
 apiRouter.use(bodyParser.urlencoded({limit: '50mb', extended: false}))
 apiRouter.use(bodyParser.json({limit: '50mb'}))
 // 解决不能上传过大图片的问题：413 (payload too large)
@@ -107,27 +105,87 @@ apiRouter.get('/testGM', (req, res) => {
  * Route to create a new post, AUTH REQUIRED
  */
 apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
-  if (req.body.title && req.body.content) {
-    Post.make(driver, [null, req.body.title, req.body.content, new Date().toLocaleDateString("en-US")], (result) => {
-      if (result) {
-        res.status(200)
-        res.send('ok')
-      } else {
-        res.status(500)
-        res.send('internal error')
-      }
-    })
+  // if (req.body.title && req.body.content) {
+  if (req.body.title && req.body.img_url && req.body.rect && req.body.chosen_tags.length !== 0 && req.body.html) {
+    let img_path_half = './static/imgs/' + 'imgTitle'; // 原图和剪裁后的图，两种名字还要处理
+    let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
+    let html_path = './static/htmls/' + 'htmlTitle' + '.txt';
+
+    handleImg(req.body.img_url, req.body.rect, img_path_half);
+    // let tags = handleTags(req.body.chosen_tags);
+    // let tags = req.body.chosen_tags.to;
+    handleHtml(req.body.html, html_path);
+
+    console.log(img_path,html_path,req.body.chosen_tags);
+    res.status(200);
+    res.send('ok');
+
+    // Post.make(driver, [null, req.body.title, req.body.content, new Date().toLocaleDateString("en-US")], (result) => {
+    //   if (result) {
+    //     res.status(200)
+    //     res.send('ok')
+    //   } else {
+    //     res.status(500)
+    //     res.send('internal error')
+    //   }
+    // })
   } else {
     res.status(400)
     res.send('bad request')
   }
-})
+});
 
-// 图片剪裁代码
+// 处理图片，保存 + 剪裁，返回剪裁后的图片路径
+function handleImg(img_url, rect, path) {
+  // 先保存再剪裁
+  var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
+  var dataBuffer = new Buffer(base64Data, 'base64');
+  fs.writeFile(path + '_raw.jpg', dataBuffer, function (err) {
+    if (err) {
+      console.log(err);
+      return 0;
+    } else {
+      console.log('图片保存成功');
+
+      gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+        if (!err) {
+          console.log("图片剪裁成功");
+          // todo 保存数据库
+          return 1;
+        } else {
+          console.log("图片剪裁失败");
+          console.log(err);
+          return 0;
+        }
+      });
+    }
+  });
+}
+
+// 处理富文本编辑器生成的 html， 保存为txt文件，返回文件保存路径
+function handleHtml(html, path) {
+  console.log("准备写入文件");
+  fs.writeFile(path, html,  function(err) {
+    if (err) {
+      console.error(err);
+      return 0;
+    }
+    else {
+      console.log("数据写入成功！");
+      return 1
+    }
+  });
+}
+
+// 处理标签数组， 返回 '1,2,3' 格式
+function handleTags(tags) {
+
+}
+
+// 上传图片，保存图片 + 图片剪裁
 apiRouter.post('/imgPost', adminAuthenticationMiddleware, (req, res) => {
-
   if (req && req.body ) {
-    if (res.body.img_url && res.body.rect) {
+    if (req.body.img_url && req.body.rect) {
       // 先保存再剪裁
       var base64Data = req.body.img_url.replace(/^data:image\/\w+;base64,/, '');
       var dataBuffer = new Buffer(base64Data, 'base64');
@@ -139,7 +197,8 @@ apiRouter.post('/imgPost', adminAuthenticationMiddleware, (req, res) => {
         } else {
           console.log('图片保存成功');
 
-          gm('456_raw.jpg').crop(req.body.rect.width, req.body.rect.height, req.body.rect.x, req.body.rect.y).write('456.jpg', function (err) {
+          gm('456_raw.jpg').crop(req.body.rect.width, req.body.rect.height, req.body.rect.left, req.body.rect.top).write('456.jpg', function (err) {
+          // gm('456_raw.jpg').crop(68,68,74,74).write('456.jpg', function (err) {
             if (!err) {
               console.log("图片剪裁成功");
               // todo 保存数据库
@@ -160,25 +219,28 @@ apiRouter.post('/imgPost', adminAuthenticationMiddleware, (req, res) => {
     res.status(400);
     res.send('bad request')
   }
+});
 
-
-
-
-  // if(req.body.title && req.body.content){
-  //   Post.make(driver, [null, req.body.title, req.body.content, new Date().toLocaleDateString("en-US")], (result) => {
-  //     if(result){
-  //       res.status(200)
-  //       res.send('ok')
-  //     } else {
-  //       res.status(500)
-  //       res.send('internal error')
-  //     }
-  //   })
-  // } else {
-  //   res.status(400)
-  //   res.send('bad request')
-  // }
-})
+// 富文本编辑器的上传
+apiRouter.post('/testQuill', adminAuthenticationMiddleware, (req, res) => {
+  if (req.body.html) {
+    console.log("准备写入文件");
+    fs.writeFile('html.txt', req.body.html,  function(err) {
+      if (err) {
+        console.error(err);
+        res.status(500);
+        res.send('internal error');
+      } else {
+        console.log("数据写入成功！");
+        res.status(200);
+        res.send('ok');
+      }
+    });
+  } else {
+    res.status(400)
+    res.send('bad request')
+  }
+});
 /**
  * Route to get all posts
  */

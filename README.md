@@ -2,7 +2,7 @@
 
 - 后端代码参考：[challenge-3-hours-blogging](https://github.com/junthehacker/challenge-3-hours-blogging)，
 [bilibili的视频](https://www.bilibili.com/video/av18704783?from=search&seid=6901712256634222410)
-- 前端样式参考[Vic Chen的博客](http://www.vicchen.me/giveup_wordpress_and_rewrite_my_blog/)
+- 前端样式参考：[Vic Chen的博客](http://www.vicchen.me/giveup_wordpress_and_rewrite_my_blog/)
 
 ## 技术栈
 ### 后端及后台管理页面
@@ -50,6 +50,7 @@
 
   - ubuntu安装方法可能在这里有解决：https://stackoverflow.com/questions/48557587/gm-node-js-cant-resize-images-of-large-filesize
 - 富文本编辑器 [一款轻便的富文本编辑器---Quill](https://quilljs.com) | [简单示例](https://blog.csdn.net/St_Sp_En/article/details/79103754)
+
 ### 问题记录
 
 - 解决不能上传过大图片的问题：413 (payload too large)(要加在app使用的最开始，加到中间发现不生效)
@@ -62,3 +63,21 @@ apiRouter.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 apiRouter.use(bodyParser.json({limit: '50mb'}))
 ```
 
+- node文件读写
+```
+console.log("准备写入文件");
+fs.writeFile('input.txt', '我是通 过fs.writeFile 写入文件的内容',  function(err) {
+   if (err) {
+       return console.error(err);
+   }
+   console.log("数据写入成功！");
+   console.log("--------我是分割线-------------")
+   console.log("读取写入的数据！");
+   fs.readFile('input.txt', function (err, data) {
+      if (err) {
+         return console.error(err);
+      }
+      console.log("异步读取文件数据: " + data.toString());
+   });
+});
+```

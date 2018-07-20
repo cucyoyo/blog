@@ -40,6 +40,7 @@
     <div class="collapse" id="collapseExample">
       <div class="card card-body">
         <div>
+          <!--todo：禁止添加逗号，后台多个标签以逗号为分隔-->
           <el-select v-model="value4" clearable placeholder="请选择要添加或删除的标签">
             <el-option
                 v-for="item in options"
@@ -108,17 +109,12 @@
         </div>
       </div>
 
-      <input type="hidden" name="x" value="{{cropContext.left}}"/>
-      <input type="hidden" name="y" value="{{cropContext.top}}"/>
-      <input type="hidden" name="w" value="{{cropContext.width}}"/>
-      <input type="hidden" name="h" value="{{cropContext.height}}"/>
-      <input type="text" name="url" value="{{cropContext.height}}"/>
       <button @click="imgPost()" type="submit">上传</button>
       <!--<button class="btn btn-primary">上传</button>-->
     </div>
     <!------------end - 图片剪裁-->
 
-    <el-select v-model="value5" multiple placeholder="请选择标签">
+    <el-select v-model="chosen_tags" multiple placeholder="请选择标签">
       <el-option
           v-for="item in options"
           :key="item.value"
@@ -127,9 +123,35 @@
       </el-option>
     </el-select>
 
-    <textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>
+    <!--<textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>-->
 
-
+    <!----------富文本编辑器-->
+    <!--当toolbar以container的形式注册时需要显式地写出这些标签-->
+    <div id="editor_header" style="display: none;">
+      <!--字体大小-->
+      <select class="ql-size">
+        <option value="small"></option>
+        <!-- 默认按钮 -->
+        <option selected></option>
+        <option value="large"></option>
+        <option value="huge"></option>
+      </select>
+      <!--加粗按钮-->
+      <button class="ql-bold"></button>
+      <!--上标、下标按钮-->
+      <button class="ql-script" value="sub"></button>
+      <button class="ql-script" value="super"></button>
+      <!--自定义按钮-->
+      <button id="my_button"></button>
+    </div>
+    <div id="editor" style="min-height: 180px;">
+      <!--可以直接在指定元素内加入文本或者html标签-->
+      <!--<p>Hello Quill!</p>
+      <p>Some initial <strong>bold</strong> text</p>
+      <p><br></p>-->
+    </div>
+    <button @click="testQuill" class="btn btn-primary">上传</button>
+    <!----------end - 富文本编辑器-->
 
     <button type="button" class="btn btn-primary" @click="newPost">发布</button>
     <!------------- end - 添加-->
