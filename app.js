@@ -323,4 +323,10 @@ app.use('/api/v1', apiRouter)
 // Start the server
 app.listen(config.port, () => console.log('App listening on port ' + config.port))
 
-db.run()
+var sql = "insert into tags (name) values (?)"
+db.run(sql,['生活'],function(){
+  // 获取插入id
+  console.log(this.lastID);
+  // 获取改变行数
+  console.log(this.changes)
+});
