@@ -4,7 +4,7 @@ const config = require('./config')
 const sqlite3 = require('sqlite3').verbose()
 // Change database to other than :memory:, in-memory database will be lost when closed.
 // const db         = new sqlite3.Database(':memory:')
-const db = new sqlite3.Database('dd.db')
+const db = new sqlite3.Database('blog.db')
 const sha512 = require('js-sha512').sha512
 const bodyParser = require('body-parser')
 const uuidv4 = require('uuid/v4')
@@ -25,6 +25,7 @@ let driver = new SQLite3Driver(db)
 const User = require('./models/User')
 const Token = require('./models/Token')
 const Post = require('./models/Post')
+const Tag = require('./models/Tag')
 
 // 图片剪裁工具：http://aheckmann.github.io/gm/docs.html
 let gm = require('gm').subClass({imageMagick: true});
@@ -111,24 +112,24 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
     let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
     let html_path = './static/htmls/' + 'htmlTitle' + '.txt';
 
+    // todo 这里应该去捕获异常
     handleImg(req.body.img_url, req.body.rect, img_path_half);
-    // let tags = handleTags(req.body.chosen_tags);
-    // let tags = req.body.chosen_tags.to;
     handleHtml(req.body.html, html_path);
 
     console.log(img_path,html_path,req.body.chosen_tags);
-    res.status(200);
-    res.send('ok');
 
-    // Post.make(driver, [null, req.body.title, req.body.content, new Date().toLocaleDateString("en-US")], (result) => {
-    //   if (result) {
-    //     res.status(200)
-    //     res.send('ok')
-    //   } else {
-    //     res.status(500)
-    //     res.send('internal error')
-    //   }
-    // })
+    let createTime = new Date().toLocaleDateString("en-US");
+    let updateTime = createTime;
+
+    Post.make(driver, [null, req.body.title, req.body.chosen_tags, img_path, html_path, createTime, updateTime], (result) => {
+      if (result) {
+        res.status(200)
+        res.send('ok')
+      } else {
+        res.status(500)
+        res.send('internal error')
+      }
+    })
   } else {
     res.status(400)
     res.send('bad request')
@@ -321,3 +322,5 @@ app.use('/api/v1', apiRouter)
 
 // Start the server
 app.listen(config.port, () => console.log('App listening on port ' + config.port))
+
+db.run()

@@ -1,6 +1,6 @@
 const Model = require('./Model')
 
-class Post extends Model {
+class Tag extends Model {
 
     /**
      * Construct post model
@@ -10,15 +10,10 @@ class Post extends Model {
      * @param {*} content
      * @param {*} createTime
      */
-    constructor(driver, id=null, title=null, tags=null, img_path=null, html_path=null, createTime=null, updateTime=null){
+    constructor(driver, id=null, name=null){
         super(driver)
         this.id = id
-        this.title = title
-        this.tags = tags
-        this.img_path = img_path
-        this.html_path = html_path
-        this.createTime = createTime
-        this.updateTime = updateTime
+        this.name = name
     }
 
     /**
@@ -30,7 +25,7 @@ class Post extends Model {
     static get(driver, id, callback){
         driver.get(this._getTableName(), "id=?", [id], (result) => {
             if(result){
-                callback(new Post(driver, result.id, result.title, result.tags, result.img_path, result.html_path, result.createTime, result.updateTime))
+                callback(new Tag(driver, result.id, result.name))
             } else {
                 callback(false)
             }
@@ -42,7 +37,7 @@ class Post extends Model {
      * @param {*} callback
      */
     delete(callback){
-        this._driver.delete(Post._getTableName(), "id=?", [this.id], (result) => {
+        this._driver.delete(Tag._getTableName(), "id=?", [this.id], (result) => {
             if(result){
                 callback(true)
             } else {
@@ -57,17 +52,17 @@ class Post extends Model {
      * @param {*} content
      * @param {*} callback
      */
-    update(title, tags, img_path, html_path, updateTime, callback){
-        this._driver.update(Post._getTableName(), "title=?, tags=?, img_path=?, html_path=?, updateTime=?", "id=?", [title, tags, img_path, html_path, updateTime, this.id], (result) => {
-            if(result){
-                callback(true)
-                this.title = title
-                this.content = content
-            } else {
-                callback(false)
-            }
-        })
-    }
+
+    // update(name, callback){
+    //     this._driver.update(Tag._getTableName(), "name=?", "id=?", [name, this.id], (result) => {
+    //         if(result){
+    //             callback(true)
+    //             this.name = name
+    //         } else {
+    //             callback(false)
+    //         }
+    //     })
+    // }
 
     /**
      * Get all posts
@@ -80,7 +75,7 @@ class Post extends Model {
                 let objectArr = []
                 for(let i in result){
                     let post = result[i]
-                    let currObj = new Post(driver, post.id, post.title, post.tags, post.img_path, post.html_path, post.createTime, post.updateTime)
+                    let currObj = new Tag(driver, post.id, post.name)
                     objectArr.push(currObj)
                 }
                 callback(objectArr)
@@ -94,8 +89,8 @@ class Post extends Model {
      * Static method to get table name
      */
     static _getTableName(){
-        return "posts"
+        return "tags"
     }
 }
 
-module.exports = Post
+module.exports = Tag
