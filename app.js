@@ -108,28 +108,54 @@ apiRouter.get('/testGM', (req, res) => {
 apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
   // if (req.body.title && req.body.content) {
   if (req.body.title && req.body.img_url && req.body.rect && req.body.chosen_tags.length !== 0 && req.body.html) {
-    let img_path_half = './static/imgs/' + 'imgTitle'; // 原图和剪裁后的图，两种名字还要处理
-    let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
-    let html_path = './static/htmls/' + 'htmlTitle' + '.txt';
+    try {
+      // todo 这里应该有数据库的捕获异常和回滚操作
+      let createTime = new Date().toLocaleDateString("en-US");
+      let updateTime = createTime;
 
-    // todo 这里应该去捕获异常
-    handleImg(req.body.img_url, req.body.rect, img_path_half);
-    handleHtml(req.body.html, html_path);
+      var sql = "insert into posts (title, tags, createTime, updateTime) values (?,?,?,?)";
+      // var blogId;
+      db.run(sql,[req.body.title, req.body.chosen_tags, createTime, updateTime],function(){
+        // // 获取插入id
+        // console.log(this.lastID);
+        // // 获取改变行数
+        // console.log(this.changes)
+        var blogId = this.lastID;
+        let img_path_half = './static/imgs/' + blogId; // 原图和剪裁后的图，两种名字还要处理
+        let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
+        let html_path = './static/htmls/' + blogId + '.txt';
 
-    console.log(img_path,html_path,req.body.chosen_tags);
+        // todo 这里应该去捕获异常
+        handleImg(req.body.img_url, req.body.rect, img_path_half);
+        handleHtml(req.body.html, html_path);
 
-    let createTime = new Date().toLocaleDateString("en-US");
-    let updateTime = createTime;
+        // console.log(img_path,html_path,req.body.chosen_tags);
 
-    Post.make(driver, [null, req.body.title, req.body.chosen_tags, img_path, html_path, createTime, updateTime], (result) => {
-      if (result) {
+        sql = 'UPDATE posts SET img_path=?, html_path=?  WHERE id=?';
+        db.run(sql, ['imgs/' + blogId + '.jpg', html_path, blogId], function () {
+          console.log(this.changes);
+        });
         res.status(200)
         res.send('ok')
-      } else {
-        res.status(500)
-        res.send('internal error')
-      }
-    })
+      });
+
+
+    } catch(e) {
+      console.error('Error caught by catch block:', e);
+      res.status(500)
+      res.send('internal error')
+    }
+
+
+    // Post.make(driver, [null, req.body.title, req.body.chosen_tags, img_path, html_path, createTime, updateTime], (result) => {
+    //   if (result) {
+    //     res.status(200)
+    //     res.send('ok')
+    //   } else {
+    //     res.status(500)
+    //     res.send('internal error')
+    //   }
+    // })
   } else {
     res.status(400)
     res.send('bad request')
@@ -249,13 +275,30 @@ apiRouter.get('/posts', (req, res) => {
   Post.all(driver, (posts) => {
     let result = []
     for (let i in posts) {
+
+      var html = fs.readFileSync(posts[i].html_path);
+      console.log("同步读取: " + html.toString());
       result.push({
         id: posts[i].id,
         title: posts[i].title,
-        content: posts[i].content,
-        createTime: posts[i].createTime
+        tags: posts[i].tags,
+        img_url: posts[i].img_path,
+        html: html.toString(),
+        createTime: posts[i].createTime,
+        updateTime: posts[i].updateTime
       })
+
+
+      // fs.readFile(posts[i].html_path, function (err, data) {
+      //   if (err) {
+      //     return console.error(err);
+      //   }
+      //   console.log("异步读取文件数据: " );
+      //
+      // });
+
     }
+    console.log(result)
     res.send(JSON.stringify(result.reverse()))
   })
 })
@@ -323,10 +366,3 @@ app.use('/api/v1', apiRouter)
 // Start the server
 app.listen(config.port, () => console.log('App listening on port ' + config.port))
 
-var sql = "insert into tags (name) values (?)"
-db.run(sql,['生活'],function(){
-  // 获取插入id
-  console.log(this.lastID);
-  // 获取改变行数
-  console.log(this.changes)
-});

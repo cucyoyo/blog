@@ -42,8 +42,6 @@ var app = new Vue({
     username: "",
     password: "",
     authToken: "",
-    newPostTitle: "",
-    newPostContent: "",
     posts: [],
     editingPost: null,
     dialogImageUrl: '',
@@ -64,12 +62,17 @@ var app = new Vue({
       value: '5',
       label: '北京烤鸭'
     }],
+    cropper: null, // 控制图片剪裁器
+    quill: null, // 控制富文本编辑器
+
+    newPostTitle: "",
+    newPostContent: "",
     chosen_tags: [],
-    value4: '',
-    cropper: null,
     img_url: '',
     rect: null,
     html: '', // 富文本编辑器内容
+
+    value4: '',
   },
   mounted: function () {
     var self = this
@@ -142,7 +145,7 @@ var app = new Vue({
       ];
 
       /* 实例化编辑器 */
-      var quill = new Quill('#editor', {
+      self.quill = new Quill('#editor', {
         /*debug: 'info',*/
 
         modules: {
@@ -159,26 +162,26 @@ var app = new Vue({
       });
 
       /* 传入布尔值，控制编辑器是否可用 */
-      quill.enable();
+      self.quill.enable();
       //quill.blur(); //失去焦点
       //quill.focus(); //获得焦点
 
       /* 事件的绑定 */
-      quill.on('text-change', function(delta, oldDelta, source) {
-        console.log(delta);
-        console.log(oldDelta);
-        console.log(source);
-        console.log(quill.container.firstChild.innerHTML); //获取当前富文本编辑器实例的内容（带html标签）
-        self.html = quill.container.firstChild.innerHTML;
+      self.quill.on('text-change', function(delta, oldDelta, source) {
+        // console.log(delta);
+        // console.log(oldDelta);
+        // console.log(source);
+        // console.log(self.quill.container.firstChild.innerHTML); //获取当前富文本编辑器实例的内容（带html标签）
+        self.html = self.quill.container.firstChild.innerHTML;
       });
       //quill.off('text-change', handler); //事件的解绑
 
       /* 向编辑器中插值 */
-      quill.clipboard.dangerouslyPasteHTML('&nbsp;<b>Hello World</b><p>new line</p>'); //向编辑器中插入html片段
-      quill.setText('Hello!'); //向编辑器中插入文本
+      self.quill.clipboard.dangerouslyPasteHTML('&nbsp;<b>Hello World</b><p>new line</p>'); //向编辑器中插入html片段
+      // self.quill.setText('Hello!'); //向编辑器中插入文本
 
       /* 获取编辑器中的值 */
-      console.log(quill.getContents());
+      // console.log(self.quill.getContents());
 
       /* 自定义按钮 */
       var myBtn = document.querySelector("#my_button");
@@ -229,9 +232,14 @@ var app = new Vue({
             message: '成功创建文章',
             type: 'success'
           });
-          // self.newPostTitle = ""
-          // self.newPostContent = ""
-          // self.loadAllPosts()
+          self.newPostTitle = "";
+          self.chosen_tags = [];
+          self.img_url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+          self.cropper.setImage('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+          self.rect = null;
+          self.html = '';
+          self.quill.setText('');
+          self.loadAllPosts();
         }).catch(function (e) {
           console.log(e);
           self.$notify.error({

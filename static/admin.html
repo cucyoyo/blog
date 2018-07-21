@@ -58,6 +58,7 @@
     <hr>
     <!-------全部博文----------->
     <b>全部博文</b>
+    <!--<img src="imgs/6.jpg" alt="">-->
     <ul>
       <li v-for="post in posts">{{ post.title }} <button class="btn btn-light" @click="editingPost = post">编辑</button> <button class="btn btn-danger" @click="deletePost(post.id)">删除</button></li>
     </ul>
