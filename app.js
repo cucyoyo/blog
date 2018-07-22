@@ -8,6 +8,7 @@ const db = new sqlite3.Database('blog.db')
 const sha512 = require('js-sha512').sha512
 const bodyParser = require('body-parser')
 const uuidv4 = require('uuid/v4')
+const http = require('http');
 
 // Initialize API router
 let apiRouter = express.Router()
@@ -107,37 +108,59 @@ apiRouter.get('/testGM', (req, res) => {
  */
 apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
   // if (req.body.title && req.body.content) {
-  if (req.body.title && req.body.img_url && req.body.rect && req.body.chosen_tags.length !== 0 && req.body.html) {
+  if (req.body.id && req.body.title && req.body.img_url && req.body.rect && req.body.chosen_tags.length !== 0 && req.body.html) {
     try {
       // todo 这里应该有数据库的捕获异常和回滚操作
-      let createTime = new Date().toLocaleDateString("en-US");
-      let updateTime = createTime;
+      if (req.body.id == -1) {  // 新建 blog
+          let createTime = new Date().toLocaleDateString("en-US");
+          let updateTime = createTime;
+          
+          var sql = "insert into posts (title, tags, createTime, updateTime) values (?,?,?,?)";
+          // var blogId;
+          db.run(sql,[req.body.title, req.body.chosen_tags, createTime, updateTime],function(){
+              // // 获取插入id
+              // console.log(this.lastID);
+              // // 获取改变行数
+              // console.log(this.changes)
+              var blogId = this.lastID;
+              let img_path_half = './static/imgs/' + blogId; // 原图和剪裁后的图，两种名字还要处理
+              let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
+              let html_path = './static/htmls/' + blogId + '.txt';
 
-      var sql = "insert into posts (title, tags, createTime, updateTime) values (?,?,?,?)";
-      // var blogId;
-      db.run(sql,[req.body.title, req.body.chosen_tags, createTime, updateTime],function(){
-        // // 获取插入id
-        // console.log(this.lastID);
-        // // 获取改变行数
-        // console.log(this.changes)
-        var blogId = this.lastID;
-        let img_path_half = './static/imgs/' + blogId; // 原图和剪裁后的图，两种名字还要处理
-        let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
-        let html_path = './static/htmls/' + blogId + '.txt';
+              // todo 这里应该去捕获异常
+              handleImg(req.body.img_url, req.body.rect, img_path_half);
+              handleHtml(req.body.html, html_path);
 
-        // todo 这里应该去捕获异常
-        handleImg(req.body.img_url, req.body.rect, img_path_half);
-        handleHtml(req.body.html, html_path);
+              // console.log(img_path,html_path,req.body.chosen_tags);
 
-        // console.log(img_path,html_path,req.body.chosen_tags);
+              sql = 'UPDATE posts SET img_path=?, html_path=?  WHERE id=?';
+              db.run(sql, ['imgs/' + blogId + '.jpg', html_path, blogId], function () {
+                  console.log(this.changes);
+              });
+              res.status(200)
+              res.send('ok')
+          });
+      } else {    // 修改 blog
+          let updateTime = new Date().toLocaleDateString("en-US");
+          var blogId = req.body.id;
+          let img_path_half = './static/imgs/' + blogId; // 原图和剪裁后的图，两种名字还要处理
+          let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
+          let html_path = './static/htmls/' + blogId + '.txt';
 
-        sql = 'UPDATE posts SET img_path=?, html_path=?  WHERE id=?';
-        db.run(sql, ['imgs/' + blogId + '.jpg', html_path, blogId], function () {
-          console.log(this.changes);
-        });
-        res.status(200)
-        res.send('ok')
-      });
+          // todo 这里应该去捕获异常
+          handleImg(req.body.img_url, req.body.rect, img_path_half);
+          handleHtml(req.body.html, html_path);
+
+          // console.log(img_path,html_path,req.body.chosen_tags);
+
+          sql = 'UPDATE posts SET title=?, tags=?, img_path=?, html_path=?, updateTime=?  WHERE id=?';
+          db.run(sql, [req.body.title, req.body.tags, 'imgs/' + blogId + '.jpg', html_path, updateTime, blogId], function () {
+              console.log(this.changes);
+          });
+          res.status(200)
+          res.send('ok')
+      }
+     
 
 
     } catch(e) {
@@ -165,28 +188,61 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
 // 处理图片，保存 + 剪裁，返回剪裁后的图片路径
 function handleImg(img_url, rect, path) {
   // 先保存再剪裁
-  var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
-  var dataBuffer = new Buffer(base64Data, 'base64');
-  fs.writeFile(path + '_raw.jpg', dataBuffer, function (err) {
-    if (err) {
-      console.log(err);
-      return 0;
-    } else {
-      console.log('图片保存成功');
 
-      gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
-        if (!err) {
-          console.log("图片剪裁成功");
-          // todo 保存数据库
-          return 1;
-        } else {
-          console.log("图片剪裁失败");
-          console.log(err);
-          return 0;
-        }
+  //  新建时传过来的是base64，修改时是直接的url
+  if(img_url.indexOf('data:image/jpg;base64,')>-1){
+      // base64 图片操作
+      var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
+      var dataBuffer = new Buffer(base64Data, 'base64');
+
+      var html = fs.writeFileSync(path + '_raw.jpg', dataBuffer);
+      console.log('同步保存base64图片');
+  }else{
+      //path 图片操作
+      // http.get(img_url, function (res) {
+      http.get('http://www.vicchen.me/wp-content/uploads/2016/03/atom-tab1.jpg', function (res) {
+          res.setEncoding('binary');//二进制（binary）
+          var imageData ='';
+          res.on('data',function(data){//图片加载到内存变量
+              imageData += data;
+          }).on('end',function(){//加载完毕保存图片
+              fs.writeFileSync(path + '_raw.jpg', imageData, 'binary');
+              console.log('同步保存url图片');
+          });
       });
-    }
-  });
+  }
+    gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+        if (!err) {
+            console.log("图片剪裁成功");
+            // todo 保存数据库
+            return 1;
+        } else {
+            console.log("图片剪裁失败");
+            console.log(err);
+            return 0;
+        }
+    });
+
+
+  // fs.writeFile(path + '_raw.jpg', dataBuffer, function (err) {
+  //   if (err) {
+  //     console.log(err);
+  //     return 0;
+  //   } else {
+  //     console.log('图片保存成功');
+  //     gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+  //       if (!err) {
+  //         console.log("图片剪裁成功");
+  //         // todo 保存数据库
+  //         return 1;
+  //       } else {
+  //         console.log("图片剪裁失败");
+  //         console.log(err);
+  //         return 0;
+  //       }
+  //     });
+  //   }
+  // });
 }
 
 // 处理富文本编辑器生成的 html， 保存为txt文件，返回文件保存路径
@@ -277,7 +333,7 @@ apiRouter.get('/posts', (req, res) => {
     for (let i in posts) {
 
       var html = fs.readFileSync(posts[i].html_path);
-      console.log("同步读取: " + html.toString());
+      console.log("循环同步读取html内容" );
       result.push({
         id: posts[i].id,
         title: posts[i].title,

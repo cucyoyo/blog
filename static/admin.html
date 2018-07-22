@@ -60,20 +60,20 @@
     <b>全部博文</b>
     <!--<img src="imgs/6.jpg" alt="">-->
     <ul>
-      <li v-for="post in posts">{{ post.title }} <button class="btn btn-light" @click="editingPost = post">编辑</button> <button class="btn btn-danger" @click="deletePost(post.id)">删除</button></li>
+      <li v-for="post in posts">{{ post.title }} <button class="btn btn-light" @click="edit(post)">编辑</button> <button class="btn btn-danger" @click="deletePost(post.id)">删除</button></li>
     </ul>
     <!--------- end - 全部博文-->
 
     <!-----------编辑-->
-    <div v-if="editingPost">
-      <input type="text" class="form-control" v-model="editingPost.title" placeholder="标题" />
-      <textarea v-model="editingPost.content" class="form-control" style="height: 200px" placeholder="内容"></textarea>
-      <button type="button" class="btn btn-primary" @click="savePost">保存</button>
-    </div>
+    <!--<div v-if="editingPost">-->
+      <!--<input type="text" class="form-control" v-model="editingPost.title" placeholder="标题" />-->
+      <!--<textarea v-model="editingPost.content" class="form-control" style="height: 200px" placeholder="内容"></textarea>-->
+      <!--<button type="button" class="btn btn-primary" @click="savePost">保存</button>-->
+    <!--</div>-->
     <!-----------end -编辑-->
 
     <!---------------添加-->
-    <input type="text" class="form-control" v-model="newPostTitle" placeholder="标题" />
+    <input type="text" class="form-control" v-model="title" placeholder="标题" />
 
     <!----------------图片剪裁-->
     <div class="form">
@@ -84,7 +84,7 @@
       </p>
       <div class="preview-container">
         <div class="image-container target" id="cropper-target">
-          <img id="img-target" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+          <img id="img-target" :src="default_img" class="noavatar" />
         </div>
         <div class="large-wrapper">
           <div class="image-container large" id="preview-large">
@@ -110,8 +110,7 @@
         </div>
       </div>
 
-      <button @click="imgPost()" type="submit">上传</button>
-      <!--<button class="btn btn-primary">上传</button>-->
+      <!--<button @click="imgPost()">上传</button>-->
     </div>
     <!------------end - 图片剪裁-->
 
@@ -151,10 +150,16 @@
       <p>Some initial <strong>bold</strong> text</p>
       <p><br></p>-->
     </div>
-    <button @click="testQuill" class="btn btn-primary">上传</button>
+    <!--<button @click="testQuill" class="btn btn-primary">上传</button>-->
     <!----------end - 富文本编辑器-->
 
-    <button type="button" class="btn btn-primary" @click="newPost">发布</button>
+    <div v-if="!editingPost">
+      <button type="button" class="btn btn-primary" @click="newPost(0)">发布</button>
+    </div>
+    <div v-else>
+      <button type="button" class="btn btn-primary" @click="newPost(1)">修改</button>
+      <button type="button" class="btn btn-default" @click="cancelEdit">取消修改</button>
+    </div>
     <!------------- end - 添加-->
   </div>
 

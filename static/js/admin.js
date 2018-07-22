@@ -65,12 +65,15 @@ var app = new Vue({
     cropper: null, // 控制图片剪裁器
     quill: null, // 控制富文本编辑器
 
-    newPostTitle: "",
-    newPostContent: "",
+    // newPostTitle: "",
+      edit_id: -1,
+      title: '',
+    // newPostContent: "",
     chosen_tags: [],
     img_url: '',
     rect: null,
     html: '', // 富文本编辑器内容
+      default_img: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 
     value4: '',
   },
@@ -214,11 +217,12 @@ var app = new Vue({
     /**
      * Create a new blog post
      */
-    newPost: function () {
-      var self = this
-      if (this.newPostTitle && this.img_url && this.rect && this.chosen_tags.length !== 0 && this.html) {
+    newPost: function (flag) {    // flag=0： 新建； flag=1：编辑修改
+      var self = this;
+      if (this.title && this.img_url && this.rect && this.chosen_tags.length !== 0 && this.html) {
         axios.post("/api/v1/createNewPost", {
-          title: this.newPostTitle,
+          id: this.edit_id,
+          title: this.title,
           // content: this.newPostContent
           img_url: this.img_url,
           rect: this.rect,
@@ -232,14 +236,17 @@ var app = new Vue({
             message: '成功创建文章',
             type: 'success'
           });
-          self.newPostTitle = "";
+          self.title = "";
           self.chosen_tags = [];
-          self.img_url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-          self.cropper.setImage('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+          // self.img_url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+          self.img_url = self.default_img;
+          // self.cropper.setImage('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+          self.cropper.setImage(self.default_img);
           self.rect = null;
           self.html = '';
           self.quill.setText('');
           self.loadAllPosts();
+          self.editingPost = null;
         }).catch(function (e) {
           console.log(e);
           self.$notify.error({
@@ -264,6 +271,34 @@ var app = new Vue({
         self.posts = data.data
       })
     },
+      // todo  ---- 点击编辑博客按钮
+      edit(post) {
+          this.editingPost = post;
+          this.edit_id = post.id;
+          this.title = post.title;
+          this.chosen_tags = post.tags.split(",");
+          this.img_url = post.img_url;
+          this.cropper.setImage('http://127.0.0.1:3000/' + this.img_url);
+          // this.rect = null;
+          this.html = post.html;
+          // this.quill.setText('');
+          this.quill.clipboard.dangerouslyPasteHTML(this.html);
+
+      },
+      cancelEdit() {
+          this.editingPost = null;
+          this.edit_id = -1;
+          this.title = null;
+          this.chosen_tags = [];
+          this.img_url = this.default_img;
+          this.cropper.setImage(this.default_img);
+          // this.rect = null;
+          this.html = '';
+          this.quill.setText('');
+          // this.quill.clipboard.dangerouslyPasteHTML(this.html);
+
+      },
+
     /**
      * Save/upate a blog post
      */

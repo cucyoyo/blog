@@ -1,1 +1,0 @@
-<p><strong style="color: rgb(230, 0, 0);">这是一篇博客</strong></p>
