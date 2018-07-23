@@ -109,3 +109,16 @@ console.log("同步读取: " + html.toString());
    	});
    });
 ```
+- 实时监控和更新node js 文件
+```
+npm install -g supervisor
+supervisor app.js
+```
+
+- 由于浏览器缓存的问题，图片地址不变（服务器图片内容发生了变化）使得图片不刷新变更
+	在图片地址src不变的情况下让浏览器重新加载图片 
+	实际上，在src不变时，浏览器直接就去读取缓存了 
+
+	解决办法： 
+	var img_src ='http://www.ilsea.net/images/seagull.jpg?t='+Math.random(); 
+

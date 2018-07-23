@@ -31,10 +31,17 @@ function getCookie(cname) {
   return "";
 }
 
+// $(document).ready(function(){
+//   $("#edit-button").click(function(){
+//     // 页面滚动到下面编辑的内容位置
+//     console.log("jsdlfjljsljf")
+//     $('html, body').animate({scrollTop:$("#edit-section").offset().top  }, 1000);
+//   });
+// });
+
 /**
  * Initialize Vue.js
  */
-
 // var VueCropper = require('../../node_modules/vue-cropper')
 var app = new Vue({
   el: '#app',
@@ -46,34 +53,20 @@ var app = new Vue({
     editingPost: null,
     dialogImageUrl: '',
     dialogVisible: false,
-    options: [{
-      value: '1',
-      label: '黄金糕'
-    }, {
-      value: '2',
-      label: '双皮奶'
-    }, {
-      value: '3',
-      label: '蚵仔煎'
-    }, {
-      value: '4',
-      label: '龙须面'
-    }, {
-      value: '5',
-      label: '北京烤鸭'
-    }],
+    all_tags: [],
     cropper: null, // 控制图片剪裁器
     quill: null, // 控制富文本编辑器
 
     // newPostTitle: "",
-      edit_id: -1,
-      title: '',
+    edit_id: -1,
+    title: '',
+    desc: '',
     // newPostContent: "",
-    chosen_tags: [],
+    tags: [],
     img_url: '',
     rect: null,
     html: '', // 富文本编辑器内容
-      default_img: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+    default_img: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 
     value4: '',
   },
@@ -157,20 +150,21 @@ var app = new Vue({
           /*toolbar: {
               container:"#editor_header"
           }*/ // 或者 toolbar :'#editor_header'
-          toolbar:toolbarOptions  //指定编辑器操作条
+          toolbar: toolbarOptions  //指定编辑器操作条
         },
         theme: 'snow', //主题，有两种，snow和bubble
-        placeholder:'请输入',
+        placeholder: '请输入',
         readOnly: false
       });
 
       /* 传入布尔值，控制编辑器是否可用 */
       self.quill.enable();
+
       //quill.blur(); //失去焦点
       //quill.focus(); //获得焦点
 
       /* 事件的绑定 */
-      self.quill.on('text-change', function(delta, oldDelta, source) {
+      self.quill.on('text-change', function (delta, oldDelta, source) {
         // console.log(delta);
         // console.log(oldDelta);
         // console.log(source);
@@ -180,7 +174,7 @@ var app = new Vue({
       //quill.off('text-change', handler); //事件的解绑
 
       /* 向编辑器中插值 */
-      self.quill.clipboard.dangerouslyPasteHTML('&nbsp;<b>Hello World</b><p>new line</p>'); //向编辑器中插入html片段
+      // self.quill.clipboard.dangerouslyPasteHTML('&nbsp;<b>Hello World</b><p>new line</p>'); //向编辑器中插入html片段
       // self.quill.setText('Hello!'); //向编辑器中插入文本
 
       /* 获取编辑器中的值 */
@@ -188,7 +182,7 @@ var app = new Vue({
 
       /* 自定义按钮 */
       var myBtn = document.querySelector("#my_button");
-      myBtn.addEventListener("click",function(){
+      myBtn.addEventListener("click", function () {
         console.log('my-btn')
       })
       // --------end - 富文本编辑器
@@ -198,6 +192,9 @@ var app = new Vue({
 
   },
   methods: {
+    setImgurl(img_url) {
+      return 'http://127.0.0.1:3000/' + img_url + '?t=' + Math.random();
+    },
     /**
      * Attempt a login
      */
@@ -219,14 +216,15 @@ var app = new Vue({
      */
     newPost: function (flag) {    // flag=0： 新建； flag=1：编辑修改
       var self = this;
-      if (this.title && this.img_url && this.rect && this.chosen_tags.length !== 0 && this.html) {
+      if (this.title && this.desc && this.img_url && this.rect && this.tags.length !== 0 && this.html) {
         axios.post("/api/v1/createNewPost", {
           id: this.edit_id,
           title: this.title,
+          desc: this.desc ,
           // content: this.newPostContent
           img_url: this.img_url,
           rect: this.rect,
-          chosen_tags: this.chosen_tags.toString(),
+          tags: this.tags.toString(),
           html: this.html
         }, {
           headers: {'token': this.authToken}
@@ -237,7 +235,8 @@ var app = new Vue({
             type: 'success'
           });
           self.title = "";
-          self.chosen_tags = [];
+          self.desc = "";
+          self.tags = [];
           // self.img_url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
           self.img_url = self.default_img;
           // self.cropper.setImage('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
@@ -247,6 +246,7 @@ var app = new Vue({
           self.quill.setText('');
           self.loadAllPosts();
           self.editingPost = null;
+          self.goTop(); // 回到顶部
         }).catch(function (e) {
           console.log(e);
           self.$notify.error({
@@ -268,36 +268,50 @@ var app = new Vue({
     loadAllPosts: function () {
       var self = this
       axios.get("/api/v1/posts").then(function (data) {
-        self.posts = data.data
+        self.posts = data.data.posts
+        self.all_tags = data.data.all_tags
       })
     },
-      // todo  ---- 点击编辑博客按钮
-      edit(post) {
-          this.editingPost = post;
-          this.edit_id = post.id;
-          this.title = post.title;
-          this.chosen_tags = post.tags.split(",");
-          this.img_url = post.img_url;
-          this.cropper.setImage('http://127.0.0.1:3000/' + this.img_url);
-          // this.rect = null;
-          this.html = post.html;
-          // this.quill.setText('');
-          this.quill.clipboard.dangerouslyPasteHTML(this.html);
+    // todo  ---- 点击编辑博客按钮
+    edit(post) {
+      this.editingPost = post;
+      this.edit_id = post.id;
+      this.title = post.title;
+      this.desc = post.desc;
+      this.tags = post.tags.split(",");
+      this.img_url = post.img_url;
+      // console.log("setimage:" + 'http://127.0.0.1:3000/' + this.img_url + '?t=' + Math.random());
+      this.cropper.setImage('http://127.0.0.1:3000/' + this.img_url + '?t=' + Math.random());
+      // this.rect = null;
+      this.html = post.html;
+      // this.quill.setText('');
+      this.quill.clipboard.dangerouslyPasteHTML(this.html);
 
-      },
-      cancelEdit() {
-          this.editingPost = null;
-          this.edit_id = -1;
-          this.title = null;
-          this.chosen_tags = [];
-          this.img_url = this.default_img;
-          this.cropper.setImage(this.default_img);
-          // this.rect = null;
-          this.html = '';
-          this.quill.setText('');
-          // this.quill.clipboard.dangerouslyPasteHTML(this.html);
+      this.goEdit();
 
-      },
+    },
+    // 滚动到编辑博客位置
+    goEdit() {
+      $('html, body').animate({scrollTop:$("#edit-section").offset().top  }, 500);
+    },
+    // 回到顶部按钮
+    goTop() {
+      $('html, body').animate({scrollTop:0 }, 500);
+    },
+    cancelEdit() {
+      this.editingPost = null;
+      this.edit_id = -1;
+      this.title = '';
+      this.desc = '';
+      this.tags = [];
+      this.img_url = this.default_img;
+      this.cropper.setImage(this.default_img);
+      // this.rect = null;
+      this.html = '';
+      this.quill.setText('');
+      // this.quill.clipboard.dangerouslyPasteHTML(this.html);
+
+    },
 
     /**
      * Save/upate a blog post
@@ -306,6 +320,7 @@ var app = new Vue({
       var self = this
       axios.post("/api/v1/updatePost", {
         title: this.editingPost.title,
+        desc: this.editingPost.desc,
         content: this.editingPost.content,
         id: this.editingPost.id
       }, {
@@ -361,10 +376,19 @@ var app = new Vue({
         }, {
           headers: {'token': this.authToken}
         }).then(function (data) {
-          alert("成功删除文章")
+          // alert("成功删除文章")
+          self.$notify({
+            title: '成功',
+            message: '成功删除文章',
+            type: 'success'
+          })
           self.loadAllPosts()
         }).catch(function (e) {
-          alert("删除文章失败")
+          // alert("删除文章失败")
+          self.$notify.error({
+            title: '失败',
+            message: '删除文章失败',
+          })
         })
       }
     }

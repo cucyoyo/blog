@@ -15,7 +15,7 @@
   <link href="https://cdn.bootcss.com/quill/1.3.6/quill.bubble.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container" id="app">
+<div class="container" id="app" style="margin: 20px 50px">
   <div v-if="!authToken">
     <h1>登陆管理界面</h1>
     <form>
@@ -43,7 +43,7 @@
           <!--todo：禁止添加逗号，后台多个标签以逗号为分隔-->
           <el-select v-model="value4" clearable placeholder="请选择要添加或删除的标签">
             <el-option
-                v-for="item in options"
+                v-for="item in all_tags"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
@@ -57,11 +57,25 @@
     <!----------end-标签管理----------->
     <hr>
     <!-------全部博文----------->
-    <b>全部博文</b>
-    <!--<img src="imgs/6.jpg" alt="">-->
-    <ul>
-      <li v-for="post in posts">{{ post.title }} <button class="btn btn-light" @click="edit(post)">编辑</button> <button class="btn btn-danger" @click="deletePost(post.id)">删除</button></li>
-    </ul>
+    <h2>全部博文</h2>
+    <div v-for="post in posts" class="card" style="margin-bottom: 15px; width: 70%">
+      <!--<img class="card-img-top" :src='setImgurl(post.img_url)' style="width:100%; height: 150px;" alt="Card image cap">-->
+      <div class="card-block" style="padding:15px 15px 10px;">
+        <h4 class="card-title">{{ post.title }}</h4>
+        <p class="info" style="color: #aaa">创建：{{post.createTime }} | 更新：{{post.updateTime}}</p>
+        <p class="des" style="text-indent: 2ch;">{{post.desc}} </p>
+        <div class="foot">
+          <span v-for="tag in post.tags.split(',')" style="background: #9d9d9d;color: #fff; margin-right: 5px; padding: 2px; border-radius: 5px;" class="tag">{{tag}}</span>
+          <!--<span class="pull-left tag">#标签</span>-->
+          <div class="float-right">
+            <button id="edit-button" class="btn btn-primary" @click="edit(post)">编辑</button>
+            <button class="btn btn-danger" @click="deletePost(post.id)">删除</button>
+          </div>
+          <!--<router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>-->
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
     <!--------- end - 全部博文-->
 
     <!-----------编辑-->
@@ -72,8 +86,24 @@
     <!--</div>-->
     <!-----------end -编辑-->
 
+    <hr>
+    <hr>
+    <hr>
+    <h2 id="edit-section">编辑模块</h2>
     <!---------------添加-->
     <input type="text" class="form-control" v-model="title" placeholder="标题" />
+
+    <el-select v-model="tags" multiple placeholder="请选择标签" style="margin:15px 0">
+      <el-option
+          v-for="item in all_tags"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+      </el-option>
+    </el-select>
+
+    <textarea v-model="desc" class="form-control" style="height: 100px" placeholder="添加描述"></textarea>
+
 
     <!----------------图片剪裁-->
     <div class="form">
@@ -114,58 +144,55 @@
     </div>
     <!------------end - 图片剪裁-->
 
-    <el-select v-model="chosen_tags" multiple placeholder="请选择标签">
-      <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-      </el-option>
-    </el-select>
-
-    <!--<textarea v-model="newPostContent" class="form-control" style="height: 200px" placeholder="内容"></textarea>-->
 
     <!----------富文本编辑器-->
-    <!--当toolbar以container的形式注册时需要显式地写出这些标签-->
-    <div id="editor_header" style="display: none;">
-      <!--字体大小-->
-      <select class="ql-size">
-        <option value="small"></option>
-        <!-- 默认按钮 -->
-        <option selected></option>
-        <option value="large"></option>
-        <option value="huge"></option>
-      </select>
-      <!--加粗按钮-->
-      <button class="ql-bold"></button>
-      <!--上标、下标按钮-->
-      <button class="ql-script" value="sub"></button>
-      <button class="ql-script" value="super"></button>
-      <!--自定义按钮-->
-      <button id="my_button"></button>
-    </div>
-    <div id="editor" style="min-height: 180px;">
-      <!--可以直接在指定元素内加入文本或者html标签-->
-      <!--<p>Hello Quill!</p>
-      <p>Some initial <strong>bold</strong> text</p>
-      <p><br></p>-->
+    <div style="margin-bottom:15px">
+      <!--当toolbar以container的形式注册时需要显式地写出这些标签-->
+      <div id="editor_header" style="display: none;">
+        <!--字体大小-->
+        <select class="ql-size">
+          <option value="small"></option>
+          <!-- 默认按钮 -->
+          <option selected></option>
+          <option value="large"></option>
+          <option value="huge"></option>
+        </select>
+        <!--加粗按钮-->
+        <button class="ql-bold"></button>
+        <!--上标、下标按钮-->
+        <button class="ql-script" value="sub"></button>
+        <button class="ql-script" value="super"></button>
+        <!--自定义按钮-->
+        <button id="my_button"></button>
+      </div>
+      <div id="editor" style="min-height: 180px;">
+        <!--可以直接在指定元素内加入文本或者html标签-->
+        <!--<p>Hello Quill!</p>
+        <p>Some initial <strong>bold</strong> text</p>
+        <p><br></p>-->
+      </div>
     </div>
     <!--<button @click="testQuill" class="btn btn-primary">上传</button>-->
     <!----------end - 富文本编辑器-->
 
     <div v-if="!editingPost">
-      <button type="button" class="btn btn-primary" @click="newPost(0)">发布</button>
+      <button type="button" class="btn btn-primary" @click="newPost(0)">新建博文</button>
     </div>
     <div v-else>
-      <button type="button" class="btn btn-primary" @click="newPost(1)">修改</button>
+      <button type="button" class="btn btn-primary" @click="newPost(1)">修改博文</button>
       <button type="button" class="btn btn-default" @click="cancelEdit">取消修改</button>
     </div>
     <!------------- end - 添加-->
   </div>
 
+  <!--回到顶部按钮-->
+  <button class="btn btn-light" @click="goTop()" style="position: fixed; bottom: 20px; right: 20px">回到顶部</button>
+  <button class="btn btn-primary" @click="goEdit()" style="position: fixed; top: 20px; right: 20px">+ 新建博文</button>
+
 </div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<!--<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <!--<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->

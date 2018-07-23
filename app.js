@@ -108,16 +108,17 @@ apiRouter.get('/testGM', (req, res) => {
  */
 apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
   // if (req.body.title && req.body.content) {
-  if (req.body.id && req.body.title && req.body.img_url && req.body.rect && req.body.chosen_tags.length !== 0 && req.body.html) {
+  if (req.body.id && req.body.title && req.body.desc && req.body.img_url && req.body.rect && req.body.tags.length !== 0 && req.body.html) {
     try {
       // todo 这里应该有数据库的捕获异常和回滚操作
       if (req.body.id == -1) {  // 新建 blog
-          let createTime = new Date().toLocaleDateString("en-US");
+          // let createTime = new Date().toLocaleDateString("en-US");
+          let createTime = new Date().toLocaleString();
           let updateTime = createTime;
-          
-          var sql = "insert into posts (title, tags, createTime, updateTime) values (?,?,?,?)";
+
+          var sql = "insert into posts (title, tags, desc, createTime, updateTime) values (?,?,?,?,?)";
           // var blogId;
-          db.run(sql,[req.body.title, req.body.chosen_tags, createTime, updateTime],function(){
+          db.run(sql,[req.body.title, req.body.tags, req.body.desc,createTime, updateTime],function(){
               // // 获取插入id
               // console.log(this.lastID);
               // // 获取改变行数
@@ -131,8 +132,6 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
               handleImg(req.body.img_url, req.body.rect, img_path_half);
               handleHtml(req.body.html, html_path);
 
-              // console.log(img_path,html_path,req.body.chosen_tags);
-
               sql = 'UPDATE posts SET img_path=?, html_path=?  WHERE id=?';
               db.run(sql, ['imgs/' + blogId + '.jpg', html_path, blogId], function () {
                   console.log(this.changes);
@@ -141,7 +140,8 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
               res.send('ok')
           });
       } else {    // 修改 blog
-          let updateTime = new Date().toLocaleDateString("en-US");
+          let updateTime = new Date().toLocaleString();
+          // let updateTime = new Date().toLocaleDateString("en-US");
           var blogId = req.body.id;
           let img_path_half = './static/imgs/' + blogId; // 原图和剪裁后的图，两种名字还要处理
           let img_path = img_path_half + '.jpg'; // 原图和剪裁后的图，两种名字还要处理
@@ -151,16 +151,14 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
           handleImg(req.body.img_url, req.body.rect, img_path_half);
           handleHtml(req.body.html, html_path);
 
-          // console.log(img_path,html_path,req.body.chosen_tags);
-
-          sql = 'UPDATE posts SET title=?, tags=?, img_path=?, html_path=?, updateTime=?  WHERE id=?';
-          db.run(sql, [req.body.title, req.body.tags, 'imgs/' + blogId + '.jpg', html_path, updateTime, blogId], function () {
+          sql = 'UPDATE posts SET title=?, desc=?, tags=?, img_path=?, html_path=?, updateTime=?  WHERE id=?';
+          db.run(sql, [req.body.title, req.body.desc,req.body.tags, 'imgs/' + blogId + '.jpg', html_path, updateTime, blogId], function () {
               console.log(this.changes);
           });
           res.status(200)
           res.send('ok')
       }
-     
+
 
 
     } catch(e) {
@@ -170,7 +168,7 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
     }
 
 
-    // Post.make(driver, [null, req.body.title, req.body.chosen_tags, img_path, html_path, createTime, updateTime], (result) => {
+    // Post.make(driver, [null, req.body.title, req.body.tags, img_path, html_path, createTime, updateTime], (result) => {
     //   if (result) {
     //     res.status(200)
     //     res.send('ok')
@@ -189,60 +187,89 @@ apiRouter.post('/createNewPost', adminAuthenticationMiddleware, (req, res) => {
 function handleImg(img_url, rect, path) {
   // 先保存再剪裁
 
-  //  新建时传过来的是base64，修改时是直接的url
-  if(img_url.indexOf('data:image/jpg;base64,')>-1){
-      // base64 图片操作
-      var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
-      var dataBuffer = new Buffer(base64Data, 'base64');
+  // //  新建时传过来的是base64，修改时是直接的url
+  // if(img_url.indexOf('data:image/jpg;base64,')>-1){
+  //     // base64 图片操作
+  //     var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
+  //     var dataBuffer = new Buffer(base64Data, 'base64');
+  //
+  //     var html = fs.writeFileSync(path + '_raw.jpg', dataBuffer);
+  //     console.log('同步保存base64图片');
+  // }else{
+  //     //path 图片操作
+  //     // http.get(img_url, function (res) {
+  //     http.get('http://www.vicchen.me/wp-content/uploads/2016/03/atom-tab1.jpg', function (res) {
+  //         res.setEncoding('binary');//二进制（binary）
+  //         var imageData ='';
+  //         res.on('data',function(data){//图片加载到内存变量
+  //             imageData += data;
+  //         }).on('end',function(){//加载完毕保存图片
+  //             fs.writeFileSync(path + '_raw.jpg', imageData, 'binary');
+  //             console.log('同步保存url图片');
+  //         });
+  //     });
+  // }
+  //   gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+  //       if (!err) {
+  //           console.log("图片剪裁成功");
+  //           // todo 保存数据库
+  //           return 1;
+  //       } else {
+  //           console.log("图片剪裁失败");
+  //           console.log(err);
+  //           return 0;
+  //       }
+  //   });
 
-      var html = fs.writeFileSync(path + '_raw.jpg', dataBuffer);
-      console.log('同步保存base64图片');
-  }else{
-      //path 图片操作
-      // http.get(img_url, function (res) {
-      http.get('http://www.vicchen.me/wp-content/uploads/2016/03/atom-tab1.jpg', function (res) {
-          res.setEncoding('binary');//二进制（binary）
-          var imageData ='';
-          res.on('data',function(data){//图片加载到内存变量
-              imageData += data;
-          }).on('end',function(){//加载完毕保存图片
-              fs.writeFileSync(path + '_raw.jpg', imageData, 'binary');
-              console.log('同步保存url图片');
-          });
-      });
-  }
-    gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
-        if (!err) {
+
+  // 先保存再剪裁
+  if(img_url.indexOf('data:image')>-1){
+    var base64Data = img_url.replace(/^data:image\/\w+;base64,/, '');
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    fs.writeFile(path + '_raw.jpg', dataBuffer, function (err) {
+      if (err) {
+        console.log(err);
+        return 0;
+      } else {
+        console.log('图片保存成功');
+
+        gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+          if (!err) {
             console.log("图片剪裁成功");
             // todo 保存数据库
             return 1;
-        } else {
+          } else {
             console.log("图片剪裁失败");
             console.log(err);
             return 0;
-        }
+          }
+        });
+      }
+    });
+  }else{ // 直接剪裁，不重新生成原始图片
+    console.log(path)
+    console.log(rect)
+    fs.rename(path + '.jpg', path + '_raw.jpg', function (err) {
+      if (err) throw err;
+      fs.stat(path + '_raw.jpg', function (err, stats) {
+        if (err) throw err;
+        console.log('stats: ' + JSON.stringify(stats));
+        gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
+          if (!err) {
+            console.log("图片剪裁成功");
+            // todo 保存数据库
+            return 1;
+          } else {
+            console.log("图片剪裁失败");
+            console.log(err);
+            return 0;
+          }
+        });
+      });
     });
 
+  }
 
-  // fs.writeFile(path + '_raw.jpg', dataBuffer, function (err) {
-  //   if (err) {
-  //     console.log(err);
-  //     return 0;
-  //   } else {
-  //     console.log('图片保存成功');
-  //     gm(path + '_raw.jpg').crop(rect.width, rect.height, rect.left, rect.top).write(path + '.jpg', function (err) {
-  //       if (!err) {
-  //         console.log("图片剪裁成功");
-  //         // todo 保存数据库
-  //         return 1;
-  //       } else {
-  //         console.log("图片剪裁失败");
-  //         console.log(err);
-  //         return 0;
-  //       }
-  //     });
-  //   }
-  // });
 }
 
 // 处理富文本编辑器生成的 html， 保存为txt文件，返回文件保存路径
@@ -328,34 +355,42 @@ apiRouter.post('/testQuill', adminAuthenticationMiddleware, (req, res) => {
  * Route to get all posts
  */
 apiRouter.get('/posts', (req, res) => {
+  let data = {};
+  let result = [];
+  let all_tags = [];
+  // let a = "kljals"
   Post.all(driver, (posts) => {
-    let result = []
+    // console.log(a)
     for (let i in posts) {
-
+      // console.log(result)
       var html = fs.readFileSync(posts[i].html_path);
       console.log("循环同步读取html内容" );
       result.push({
         id: posts[i].id,
         title: posts[i].title,
+        desc: posts[i].desc,
         tags: posts[i].tags,
         img_url: posts[i].img_path,
         html: html.toString(),
         createTime: posts[i].createTime,
         updateTime: posts[i].updateTime
       })
-
-
-      // fs.readFile(posts[i].html_path, function (err, data) {
-      //   if (err) {
-      //     return console.error(err);
-      //   }
-      //   console.log("异步读取文件数据: " );
-      //
-      // });
-
     }
-    console.log(result)
-    res.send(JSON.stringify(result.reverse()))
+    // data.posts = JSON.stringify(result.reverse());
+    data.posts = result.reverse();
+
+    Tag.all(driver, (tags) => {
+      for (let i in tags) {
+        // console.log(result)
+        all_tags.push({
+          id: tags[i].id,
+          value: tags[i].name,
+          label: tags[i].name,
+        })
+      }
+      data.all_tags = all_tags;
+      res.send(data)
+    })
   })
 })
 
@@ -364,10 +399,10 @@ apiRouter.get('/posts', (req, res) => {
  * Route to update a post, AUTH REQUIRED
  */
 apiRouter.post('/updatePost', adminAuthenticationMiddleware, (req, res, next) => {
-  if (req.body.id, req.body.title, req.body.content) {
+  if (req.body.id, req.body.title, req.body.desc, req.body.content) {
     Post.get(driver, req.body.id, (post) => {
       if (post) {
-        post.update(req.body.title, req.body.content, (result) => {
+        post.update(req.body.title, req.body.desc, req.body.content, (result) => {
           if (result) {
             res.status(200)
             res.send('ok')

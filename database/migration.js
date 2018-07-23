@@ -32,6 +32,10 @@ module.exports = (db) => {
       type: 'TEXT'
     },
     {
+      name: 'desc',
+      type: 'TEXT'
+    },
+    {
       name: 'tags',
       type: 'TEXT'
     },
