@@ -30,17 +30,27 @@
                 小记
               </router-link>
             </li>
-            <li class="dropdown">
-              <a role="button" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                其他
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                <li><router-link class="router-link" :to="{name: 'index'}">其他1</router-link></li>
-                <li class="divider"></li>
-                <li><router-link class="router-link" :to="{name: 'index'}">其他2</router-link></li>
-              </ul>
+            <li>
+              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+                生活
+              </router-link>
             </li>
+            <li>
+              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+                关于
+              </router-link>
+            </li>
+            <!--<li class="dropdown">-->
+              <!--<a role="button" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                <!--其他-->
+                <!--<span class="caret"></span>-->
+              <!--</a>-->
+              <!--<ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">-->
+                <!--<li><router-link class="router-link" :to="{name: 'index'}">其他1</router-link></li>-->
+                <!--<li class="divider"></li>-->
+                <!--<li><router-link class="router-link" :to="{name: 'index'}">其他2</router-link></li>-->
+              <!--</ul>-->
+            <!--</li>-->
           </ul>
         </div>
       </div>
@@ -80,8 +90,10 @@
     },
     watch: { // 监控路由跳转
       '$route' (to, from) {
-        console.log(from);
-        this.gotop();
+        console.log(to.name);
+        if (to.name === 'detail') {
+          this.gotop();
+        }
       }
     },
     data() {

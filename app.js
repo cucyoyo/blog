@@ -49,6 +49,20 @@ User.make(driver, [null, 'admin', sha512(config.adminPassword), 'admin'], (resul
   }
 })
 
+// 允许跨域
+apiRouter.all('*',function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+
+  if (req.method == 'OPTIONS') {
+    res.send(200); /让options请求快速返回/
+  }
+  else {
+    next();
+  }
+});
+
 /**
  * Route to login and create a new token
  */

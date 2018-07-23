@@ -5,7 +5,7 @@ import axios from 'axios'
 
 // axios 配置
 axios.defaults.timeout = 10000;
-axios.defaults.baseURL = '127.0.0.1:3000/';
+axios.defaults.baseURL = 'http://127.0.0.1:3000/api/v1/';
 // 将axios挂载到prototype上，在组件中可以直接使用this.axios访问
 Vue.prototype.axios = axios;
 

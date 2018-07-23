@@ -1,21 +1,17 @@
 {
-  "name": "challenge-3-hours-blogging",
+  "name": "node + vue blog",
   "version": "1.0.0",
-  "description": "3 Hours Challenge - Blogging System Using Node.js",
+  "description": "use node to build a blog website",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/junthehacker/challenge-3-hours-blogging.git"
+    "url": "https://github.com/cucyoyo/blog.git"
   },
-  "author": "",
+  "author": "yoyo Wang",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/junthehacker/challenge-3-hours-blogging/issues"
-  },
-  "homepage": "https://github.com/junthehacker/challenge-3-hours-blogging#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
