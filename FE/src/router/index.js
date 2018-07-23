@@ -14,7 +14,8 @@ export default new Router({
   // mode: 'hash',
   routes: [
     { path: '*', name: 'notFound',component: notFound }, //404
-    { path: '/', name: 'index', component: index }, // 首页
+    // { path: '/', name: 'index', component: index }, // 首页
+    { path: '/:tag', name: 'index', component: index }, // 首页
     // { path: '/detail/:id', name: 'detail', component: detail }, // 首页
     { path: '/detail', name: 'detail', component: detail }, // 首页
 

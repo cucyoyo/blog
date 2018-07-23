@@ -39,7 +39,7 @@ export default {
   font-size: 14px;
   .content {
     background: #f9f9f9;
-    min-height: calc(100% - 45px);
+    min-height: calc(100% - 70px);
     /*margin-bottom: 40px;*/
     padding: 40px 80px 20px;
   }

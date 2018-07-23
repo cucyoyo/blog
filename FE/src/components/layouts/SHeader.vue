@@ -16,27 +16,28 @@
         <div id="navbar" class="navbar-collapse collapse navbar-right">
           <ul class="nav navbar-nav">
             <li>
-              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+              <!--<router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>-->
+              <router-link :to="{name: 'index', params: { tag:'前端' }}" role="button" aria-haspopup="true" aria-expanded="false">
                 前端
               </router-link>
             </li>
             <li>
-              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+              <router-link :to="{name: 'index', params: { tag:'后端' }}" role="button" aria-haspopup="true" aria-expanded="false">
                 后端
               </router-link>
             </li>
             <li>
-              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+              <router-link :to="{name: 'index', params: { tag:'小记' }}" role="button" aria-haspopup="true" aria-expanded="false">
                 小记
               </router-link>
             </li>
             <li>
-              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+              <router-link :to="{name: 'index', params: { tag:'生活' }}" role="button" aria-haspopup="true" aria-expanded="false">
                 生活
               </router-link>
             </li>
             <li>
-              <router-link :to="{name: 'index'}" role="button" aria-haspopup="true" aria-expanded="false">
+              <router-link :to="{name: 'index', params: { tag:'关于' }}" role="button" aria-haspopup="true" aria-expanded="false">
                 关于
               </router-link>
             </li>
