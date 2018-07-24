@@ -1,7 +1,7 @@
 <template>
   <div>
-    <nav class="navbar  navbar-fixed-top" role="navigation">
-      <div class="container-fluid" >
+    <nav class="navbar navbar-default  navbar-fixed-top" role="navigation">
+      <div class="container" >
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
@@ -14,8 +14,8 @@
             胖小左
           </router-link>
         </div>
-        <div id="navbar" class="navbar-collapse collapse navbar-right">
-          <ul class="nav navbar-nav">
+        <div id="navbar" class="navbar-collapse collapse ">
+          <ul class="nav navbar-nav navbar-right">
             <li>
               <!--<router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>-->
               <router-link :to="{name: 'index', params: { tag:'前端' }}" role="button" aria-haspopup="true" aria-expanded="false">
@@ -82,7 +82,9 @@
   export default {
     name: "sheader",
     mounted() {
-      $('.nav .router-link').on('click', function(){
+      // 点击之后回弹
+      $('nav ul li').on('click', function(){
+
         // $('.navbar-toggle').click() //bootstrap 3.x by Richard
         if($('.navbar-toggle').css('display') !== 'none'){
           $('.navbar-toggle').trigger( "click" );
@@ -113,11 +115,11 @@
 
 <style scoped>
   nav {
-    height: 70px;
-    padding: 10px 60px;
+    /*height: 70px;*/
+    padding: 10px 0;
     background: #fff;
-    border-bottom: 1px solid #efefef;
-    color: #999;
+    /*border-bottom: 1px solid #efefef;*/
+    /*color: #999;*/
   }
   .navbar-brand {
     color: #3a8ee6;
@@ -136,7 +138,7 @@
   }
 
   /*手动改变头部导航栏的默认宽度*/
-  @media (max-width: 768px) {
+  @media (max-width: 100px) {
     .navbar-header {
       float: none;
     }

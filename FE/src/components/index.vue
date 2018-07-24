@@ -1,14 +1,14 @@
 <template>
-  <div>
+  <div  v-loading="loading" >
     <div v-if="$route.params.tag !== 'all'" class="panel panel-default tagHint">
       <div class="panel-body">
         <h5>当前标签：{{ $route.params.tag }}</h5>
       </div>
     </div>
     <div v-if="posts.length > 0">
-      <div v-for="post in posts" class="thumbnail">
+      <div   v-for="post in posts" class="thumbnail">
         <!--<div>-->
-        <img :src="setImgurl(post.img_url)" alt="banner图" @click="toDetail(post)">
+        <img :src="setImgurl(post.img_url)" alt="banner图" @click="toDetail(post.id)">
         <!--</div>-->
         <div class="caption">
           <h3>{{ post.title }}</h3>
@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else-if="!loading">
       <h4>没有查询到该分类的文章</h4>
     </div>
 
@@ -38,6 +38,7 @@
       return {
         posts: [],
         all_tags: [],
+        loading: true,
       }
     },
     watch: { // 监控路由跳转
@@ -54,6 +55,7 @@
     },
     methods: {
       getData() {
+        this.loading = true;
         this.axios.get('/posts', {
           params: {
             tag: this.$route.params.tag
@@ -63,6 +65,7 @@
           // console.log(res)
           this.posts = res.data.posts;
           this.all_tags = res.data.all_tags;
+          this.loading = false;
 
         }).catch(err=>{
           console.log(err)

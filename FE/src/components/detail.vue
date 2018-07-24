@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <div  class="panel panel-default">
       <div class="panel-body">
         <h3>{{ post.title }}</h3>
@@ -23,7 +23,8 @@
     name: "detail",
     data() {
       return {
-        post: {}
+        post: {},
+        loading: true,
       }
     },
     watch: { // 监控路由跳转
@@ -40,14 +41,16 @@
     },
     methods: {
       getData() {
+        this.loading = true;
         this.axios.get('/detail', {
           params: {
             id: this.$route.params.id
           }
         }).then(res=>{
-          console.log(res.data);
+//          console.log(res.data);
           this.post = res.data;
           this.post.html = '<style>img {max-width: 100%}</style>' + this.post.html
+          this.loading = false;
         })
       }
 

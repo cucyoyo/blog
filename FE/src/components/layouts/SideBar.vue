@@ -15,16 +15,18 @@
         <span v-for="tag in all_tags" class="tagItem" :style='tagStyle()' @click="tagLink(tag.value)"> {{ tag.value }}</span>
       </div>
     </div>
-    <!--<div class="panel panel-default">-->
-      <!--<div class="panel-body">-->
-        <!--<h4>社交账号</h4>-->
+    <div class="panel panel-default social">
+      <div class="panel-body">
+        <h4>社交账号</h4>
         <!--<ul>-->
           <!--<li>1234</li>-->
           <!--<li>1234</li>-->
           <!--<li>1234</li>-->
         <!--</ul>-->
-      <!--</div>-->
-    <!--</div>-->
+        <a class="github" href="https://github.com/cucyoyo"><i class="iconfont icon-GitHub"></i></a>
+        <a class="weibo" href="https://www.weibo.com/u/3207077385/"><i class="iconfont icon-icon_weibo"></i></a>
+      </div>
+    </div>
     <div class="panel panel-default">
       <div class="panel-body">
         <h4>打赏</h4>
@@ -110,9 +112,25 @@
       .tagItem:hover{
         color: gray;
       }
+
       .payImg {
         width: 40%;
       }
+    }
+  }
+  .social {
+    a {
+      margin-right: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      .iconfont {
+        font-size: 30px;
+        /*width: 30px;*/
+        /*color: red;*/
+      }
+    }
+    .weibo{
+      color: red;
     }
   }
 

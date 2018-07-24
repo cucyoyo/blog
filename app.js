@@ -368,6 +368,7 @@ apiRouter.post('/testQuill', adminAuthenticationMiddleware, (req, res) => {
  */
 apiRouter.get('/posts', (req, res) => {
   let query_tag = '';
+  let html =''
   if (req.query && req.query.tag) {
     query_tag = req.query.tag;
   }
@@ -395,14 +396,17 @@ apiRouter.get('/posts', (req, res) => {
     console.log("循环同步读取html内容" );
     for (let i in posts) {
       // console.log(result)
-      var html = fs.readFileSync(posts[i].html_path);
+      if (query_tag === '') {
+        html = fs.readFileSync(posts[i].html_path); // 后端请求的话再读文件并且传递
+        html = html.toString();
+      }
       result.push({
         id: posts[i].id,
         title: posts[i].title,
         desc: posts[i].desc,
         tags: posts[i].tags,
         img_url: posts[i].img_path,
-        html: html.toString(),
+        html: html,
         createTime: posts[i].createTime,
         updateTime: posts[i].updateTime
       })
