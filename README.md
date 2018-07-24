@@ -19,7 +19,7 @@
 * 首先打开 config.js，修改 `port` 至你想用的端口，修改 `adminPassword` 为你的用户密码。
 * 运行 `npm install`
 * 运行 `node app.js`
-
+* **注意：**第一次运行需要将app.js中的`require('./database/migration')(db)`的注释打开，用于创建数据库`blog.db`,下次运行之前就把注释掉就好。
 ### 前端展示
 - 进入FE目录
 - npm i
