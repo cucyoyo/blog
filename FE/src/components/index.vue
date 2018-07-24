@@ -94,7 +94,7 @@
         })
       },
       setImgurl(img_url) {
-        return 'http://127.0.0.1:3000/' + img_url + '?t=' + Math.random();
+        return this.serverIP  + img_url + '?t=' + Math.random();
       },
       getTaglink(tag) {
         return "{name: 'index', params: { tag:'" + tag + "' }}"

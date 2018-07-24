@@ -193,7 +193,8 @@ var app = new Vue({
   },
   methods: {
     setImgurl(img_url) {
-      return 'http://127.0.0.1:3000/' + img_url + '?t=' + Math.random();
+      // return 'http://127.0.0.1:3000/' + img_url + '?t=' + Math.random();
+      return 'http://123.207.14.150:3000/' + img_url + '?t=' + Math.random();
     },
     /**
      * Attempt a login
@@ -281,7 +282,8 @@ var app = new Vue({
       this.tags = post.tags.split(",");
       this.img_url = post.img_url;
       // console.log("setimage:" + 'http://127.0.0.1:3000/' + this.img_url + '?t=' + Math.random());
-      this.cropper.setImage('http://127.0.0.1:3000/' + this.img_url + '?t=' + Math.random());
+      // this.cropper.setImage('http://127.0.0.1:3000/' + this.img_url + '?t=' + Math.random());
+      this.cropper.setImage(this.setImgurl(this.img_url));
       // this.rect = null;
       this.html = post.html;
       // this.quill.setText('');

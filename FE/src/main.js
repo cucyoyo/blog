@@ -26,6 +26,8 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 
+Vue.prototype.serverIP = "http://123.207.14.150:3000/"
+
 new Vue({
   el: '#app',
   router,
