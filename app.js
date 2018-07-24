@@ -369,11 +369,31 @@ apiRouter.post('/testQuill', adminAuthenticationMiddleware, (req, res) => {
  * Route to get all posts
  */
 apiRouter.get('/posts', (req, res) => {
+  console.log(req.query.tag);
+  let query_tag = '';
+  if (req.query && req.query.tag) {
+    query_tag = req.query.tag;
+  }
   let data = {};
   let result = [];
   let all_tags = [];
   // let a = "kljals"
-  Post.all(driver, (posts) => {
+  if (query_tag === '') {
+    Post.all(driver, (posts) => {
+      nextThing(posts);
+    })
+  } else {
+    // var sql = "SELECT * FROM posts where 'tags' REGEXP  'node'";
+    // var sql = "SELECT * FROM posts where tags regexp  'node'";
+    var sql = "SELECT * FROM posts where  ',' || tags || ',' like '%,"+ query_tag +",%'" ;
+    console.log(sql);
+    db.all(sql, function (err,posts) {
+      console.log("查询" + query_tag + "数据");
+      console.log(posts);
+      nextThing(posts);
+    });
+  }
+  function nextThing(posts) {
     // console.log(a)
     for (let i in posts) {
       // console.log(result)
@@ -405,7 +425,8 @@ apiRouter.get('/posts', (req, res) => {
       data.all_tags = all_tags;
       res.send(data)
     })
-  })
+  }
+
 })
 
 
