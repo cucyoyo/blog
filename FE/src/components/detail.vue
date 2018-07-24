@@ -8,8 +8,8 @@
         <!--<div v-html="c"></div>-->
         <!--<div v-html="d"></div>-->
         <div class="blog-detail">
-          <img :src="setImgurl(post.img_url)" alt="img">
-          <div v-html="post.html" style="margin-top: 20px"></div>
+          <img :src="setImgurl(post.img_path)" alt="img">
+          <div v-html="post.html" class="content"></div>
         </div>
       </div>
 
@@ -26,14 +26,31 @@
         post: {}
       }
     },
+    watch: { // 监控路由跳转
+      '$route' (to, from) {
+        // console.log(to.name);
+        // console.log(to);
+        if (to.name === 'detail' && from.name === 'detail') {// 同一个组件变换不会重新执行钩子函数，所以要手动重新获取数据
+          this.getData();
+        }
+      }
+    },
     mounted() {
-      let postStr = window.localStorage.getItem('post')
-      this.post = JSON.parse(postStr)
+      this.getData();
     },
     methods: {
-      setImgurl(img_url) {
-        return this.serverIP + img_url + '?t=' + Math.random();
-      },
+      getData() {
+        this.axios.get('/detail', {
+          params: {
+            id: this.$route.params.id
+          }
+        }).then(res=>{
+          console.log(res.data);
+          this.post = res.data;
+          this.post.html = '<style>img {max-width: 100%}</style>' + this.post.html
+        })
+      }
+
     }
   }
 </script>
@@ -48,6 +65,13 @@
       line-height: 30px;
       img{
         width: 100%;
+      }
+      .content {
+        margin-top: 20px;
+        /*p { color: red }*/
+        /*img {*/
+          /*max-width: 100%;*/
+        /*}*/
       }
     }
   }

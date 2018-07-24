@@ -8,6 +8,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
+import config from './config/config'
+Vue.prototype.serverIP = config.serverIP
 import axios from './axios'
 // 引入echarts
 import echarts from 'echarts'
@@ -26,7 +28,7 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 
-Vue.prototype.serverIP = "http://123.207.14.150:3000/"
+
 
 new Vue({
   el: '#app',

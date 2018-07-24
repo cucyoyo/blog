@@ -1,25 +1,14 @@
 <template>
   <div>
-    <!--<div v-for="i in 10" class="thumbnail">-->
-      <!--&lt;!&ndash;<div>&ndash;&gt;-->
-        <!--<img src=".././assets/img/55.png" alt="banner图" >-->
-      <!--&lt;!&ndash;</div>&ndash;&gt;-->
-      <!--<div class="caption">-->
-        <!--<h3>博客标题</h3>-->
-        <!--<p class="info">信息 </p>-->
-        <!--<p class="des">文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述文章描述 </p>-->
-        <!--<p class="foot">-->
-          <!--<span v-for="k in 3" class="pull-left tag">#标签</span>-->
-          <!--<router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>-->
-        <!--</p>-->
-        <!--<div class="clearfix"></div>-->
-        <!--&lt;!&ndash;<p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>&ndash;&gt;-->
-      <!--</div>-->
-    <!--</div>-->
+    <div v-if="$route.params.tag !== 'all'" class="panel panel-default tagHint">
+      <div class="panel-body">
+        <h5>当前标签：{{ $route.params.tag }}</h5>
+      </div>
+    </div>
     <div v-if="posts.length > 0">
       <div v-for="post in posts" class="thumbnail">
         <!--<div>-->
-        <img :src="setImgurl(post.img_url)" alt="banner图" >
+        <img :src="setImgurl(post.img_url)" alt="banner图" @click="toDetail(post)">
         <!--</div>-->
         <div class="caption">
           <h3>{{ post.title }}</h3>
@@ -28,7 +17,7 @@
           <p class="foot">
             <span v-for="tag in post.tags.split(',')" class="pull-left tag" @click="tagLink(tag)">{{tag}}</span>
             <!--<router-link :to="{name:'detail' , params: { id:2 }}" class="pull-right link">继续阅读 >></router-link>-->
-            <a class="pull-right link" @click="toDetail(post)">继续阅读 >></a>
+            <a class="pull-right link" @click="toDetail(post.id)">继续阅读 >></a>
           </p>
           <div class="clearfix"></div>
           <!--<p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
@@ -53,7 +42,8 @@
     },
     watch: { // 监控路由跳转
       '$route' (to, from) {
-        console.log(to.name);
+        // console.log(to.name);
+        // console.log(to);
         if (to.name === 'index' && from.name === 'index') {// 同一个组件变换不会重新执行钩子函数，所以要手动重新获取数据
           this.getData();
         }
@@ -61,21 +51,6 @@
     },
     mounted() {
       this.getData()
-//      console.log('jalsj')
-////      this.$route.params.id,
-//      console.log(this.$route)
-//      // this.axios.get("/posts").then(function (data) {
-//      //   console.log(data)
-//      // })
-//      this.axios.get('/posts').then(res=>{
-//        // 查看后台任务是否运行
-//        // console.log(res)
-//        this.posts = res.data.posts;
-//        this.all_tags = res.data.all_tags;
-//
-//      }).catch(err=>{
-//        console.log(err)
-//      })
     },
     methods: {
       getData() {
@@ -93,57 +68,57 @@
           console.log(err)
         })
       },
-      setImgurl(img_url) {
-        return this.serverIP  + img_url + '?t=' + Math.random();
-      },
-      getTaglink(tag) {
-        return "{name: 'index', params: { tag:'" + tag + "' }}"
-      },
-      tagLink(tag) {
-        this.$router.push({name: 'index', params: {tag: tag}})
-      },
-      toDetail(post) {
-        // consloe.log()
-        let postStr = JSON.stringify(post)
-        window.localStorage.setItem('post', postStr);
-        this.$router.push({ name: 'detail'});
-      }
     },
 
   }
 </script>
 
 <style lang="less" scoped>
+  .tagHint {
+    /*.*/
+    text-align: center;
+    background: #3a8ee6;
+    color: #fff;
+  }
 .thumbnail {
   width: 100%;
   img {
     min-width: 100%;
+    cursor: pointer;
     /*max-width: 100%;*/
   }
   .caption {
+    margin: 15px;
     .info {
       /*line-height: 30px;*/
       margin: 15px 0;
       color: #aaa;
     }
     .des {
-      text-indent: 2ch;
+      /*text-indent: 2ch;*/
     }
     .foot {
       margin: 15px 0;
       .tag {
+        font-size: 12px;
         background: #9d9d9d;
         color: #fff;
         margin-right: 5px;
-        padding: 2px;
+        padding: 5px;
         border-radius: 5px;
         cursor: pointer;
+      }
+      .tag:hover {
+        background: #3a8ee6;
       }
       .link {
         color: #3a8ee6;
         font-weight: bold;
         text-decoration: none;
         cursor: pointer;
+      }
+      .link:hover {
+        color: #66b1ff;
       }
     }
   }

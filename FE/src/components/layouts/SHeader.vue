@@ -9,7 +9,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <router-link  id="preface" class="navbar-brand router-link" :to="{name:'index'}">
+          <router-link  id="preface" class="navbar-brand router-link" :to="{path:'/'}">
+          <!--<router-link  id="preface" class="navbar-brand router-link" :path="/">-->
             胖小左
           </router-link>
         </div>

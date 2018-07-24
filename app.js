@@ -261,8 +261,6 @@ function handleImg(img_url, rect, path) {
       }
     });
   }else{ // 直接剪裁，不重新生成原始图片
-    console.log(path)
-    console.log(rect)
     fs.rename(path + '.jpg', path + '_raw.jpg', function (err) {
       if (err) throw err;
       fs.stat(path + '_raw.jpg', function (err, stats) {
@@ -369,7 +367,6 @@ apiRouter.post('/testQuill', adminAuthenticationMiddleware, (req, res) => {
  * Route to get all posts
  */
 apiRouter.get('/posts', (req, res) => {
-  console.log(req.query.tag);
   let query_tag = '';
   if (req.query && req.query.tag) {
     query_tag = req.query.tag;
@@ -378,27 +375,27 @@ apiRouter.get('/posts', (req, res) => {
   let result = [];
   let all_tags = [];
   // let a = "kljals"
-  if (query_tag === '') {
-    Post.all(driver, (posts) => {
+  if (query_tag === '' || query_tag === 'all') {
+    // Post.all(driver, (posts) => {
+    //   nextThing(posts);
+    // })
+    let sql = "SELECT * FROM posts order by updateTime desc" ;
+    db.all(sql, function (err,posts) {
       nextThing(posts);
-    })
+    });
   } else {
     // var sql = "SELECT * FROM posts where 'tags' REGEXP  'node'";
-    // var sql = "SELECT * FROM posts where tags regexp  'node'";
-    var sql = "SELECT * FROM posts where  ',' || tags || ',' like '%,"+ query_tag +",%'" ;
-    console.log(sql);
+    let sql = "SELECT * FROM posts where  ',' || tags || ',' like '%,"+ query_tag +",%'  order by updateTime desc" ;
     db.all(sql, function (err,posts) {
-      console.log("查询" + query_tag + "数据");
-      console.log(posts);
       nextThing(posts);
     });
   }
   function nextThing(posts) {
     // console.log(a)
+    console.log("循环同步读取html内容" );
     for (let i in posts) {
       // console.log(result)
       var html = fs.readFileSync(posts[i].html_path);
-      console.log("循环同步读取html内容" );
       result.push({
         id: posts[i].id,
         title: posts[i].title,
@@ -411,7 +408,8 @@ apiRouter.get('/posts', (req, res) => {
       })
     }
     // data.posts = JSON.stringify(result.reverse());
-    data.posts = result.reverse();
+    // data.posts = result.reverse();
+    data.posts = result;
 
     Tag.all(driver, (tags) => {
       for (let i in tags) {
@@ -429,7 +427,28 @@ apiRouter.get('/posts', (req, res) => {
 
 })
 
+apiRouter.get('/detail', (req, res) => {
+  // console.log(req.query.id);
+  if (req && req.query.id) {
+    let sql = "select * from posts where id = " + req.query.id
+    db.get(sql,function (err, data) {
+      if (err) {
+        console.log(err);
+        res.status(500);
+        res.send("internal error");
+      } else {
+        let html = fs.readFileSync(data.html_path);
+        data.html = html.toString();
+        res.status(200);
+        res.send(data);
+      }
+    })
+  } else {
+    res.status(400);
+    res.send('not found');
+  }
 
+});
 /**
  * Route to update a post, AUTH REQUIRED
  */

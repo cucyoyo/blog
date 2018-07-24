@@ -137,6 +137,48 @@ app.all('*',function (req, res, next) {
   }
 });
 ```
+- sqlite查询包含某个字符串的所有条目
+```
+// var sql = "SELECT * FROM posts where tags regexp  'node'"; 不知这个为啥不管用（在sqliteStudio中运行没问题）
+var sql = "SELECT * FROM posts where  ',' || tags || ',' like '%,"+ query_tag +",%'" ;
+db.all(sql, function (err,posts) {
+  nextThing(posts);
+});
+```
+- sql按照某个字段逆序排序(desc)/正序排序(asc)
+```
+SELECT * FROM posts order by updateTime desc
+```
 
 ### 前端相关问题
 - localStorage值不能是对象，只能将对象转为字符串用的时候再转回去
+- 路由重定向
+`{ path: '/', redirect:'/all'}, // 首页`
+- 标签导航，标签随机排序
+Math.random()得到的是0~1之间的随机数。
+sort()可以调用一个函数做为参数，如果这个函数返回的值为-1表示数组中的a项排在b项前。
+如此一来，可以写一个随机函数，让Math.random()随机出来的数与0.5做为一个比较，如果大于.5就返回 -1(a排在b前面)，反之返回1(b排在a前面):
+```
+function randomSort(a, b) {
+    return Math.random() > 0.5 ? -1 : 1;
+}
+var arr = [1,2,3,4,5,6,7,8,9];
+arr.sort(randomSort);
+```
+- 解决组件相同，参数不同的情况下不重新加载钩子函数（mounted）的问题
+```
+   watch: { // 监控路由跳转
+      '$route' (to, from) {
+        // console.log(to.name);
+        // console.log(to);
+        if (to.name === 'index' && from.name === 'index') {// 同一个组件变换不会重新执行钩子函数，所以要手动重新获取数据
+          this.getData();
+        }
+      }
+    },
+```
+
+### todo-list
+- 默认图片（图片加载失败时加载默认图片）
+- 懒加载
+- 下滑下载
