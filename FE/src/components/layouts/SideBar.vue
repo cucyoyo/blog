@@ -3,9 +3,9 @@
     <div class="panel panel-default">
       <div class="panel-body">
         <h4>最近文章</h4>
-        <ul class="lateBlogs">
+        <ul v-if="posts.length > 0" class="lateBlogs">
           <!--<li v-for="i in 5"><i class="iconfont icon-zuixinnew3"></i> {{ posts[i].title }} </li>-->
-          <li v-for="i in 5" @click="toDetail(posts[i].id)"> {{ posts[i].title }} </li>
+          <li v-for="i in 5" @click="toDetail(posts[i-1].id)"> {{ posts[i-1].title }} </li>
         </ul>
       </div>
     </div>
@@ -23,9 +23,29 @@
           <!--<li>1234</li>-->
           <!--<li>1234</li>-->
         <!--</ul>-->
-        <a class="github" href="https://github.com/cucyoyo"><i class="iconfont icon-GitHub"></i></a>
-        <a class="weibo" href="https://www.weibo.com/u/3207077385/"><i class="iconfont icon-icon_weibo"></i></a>
+        <a class="github" href="https://github.com/cucyoyo" target="_blank"><i class="iconfont icon-GitHub"></i></a>
+        <a v-popover:email_popover class="email" ><i class="iconfont icon-mail"></i></a>
+        <a class="weibo" href="https://www.weibo.com/u/3207077385/" target="_blank"><i class="iconfont icon-icon_weibo"></i></a>
+        <a v-popover:weixin_popover class="weixin"><i class="iconfont icon-weixin"></i></a>
+
       </div>
+      <el-popover
+        ref="email_popover"
+        placement="bottom"
+        title="邮箱联系我"
+        width="200"
+        trigger="click"
+        content="cucyoyo@163.com">
+      </el-popover>
+      <el-popover
+        ref="weixin_popover"
+        placement="bottom"
+        title="扫我加微信"
+        width="200"
+        trigger="click"
+      >
+        <img src="../../assets/img/weixin.jpg" style="width: 100%" alt="weixin-code">
+      </el-popover>
     </div>
     <div class="panel panel-default">
       <div class="panel-body">
@@ -125,12 +145,19 @@
       text-decoration: none;
       .iconfont {
         font-size: 30px;
-        /*width: 30px;*/
-        /*color: red;*/
       }
+    }
+    .github{
+      color: #000000;
+    }
+    .email{
+      color: #3a8ee6;
     }
     .weibo{
       color: red;
+    }
+    .weixin{
+      color: green;
     }
   }
 

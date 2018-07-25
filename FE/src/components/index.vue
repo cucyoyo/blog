@@ -119,6 +119,7 @@
         font-weight: bold;
         text-decoration: none;
         cursor: pointer;
+        padding: 5px 0;
       }
       .link:hover {
         color: #66b1ff;

@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <p class="footer_p">© 2018 cucyoyo. All rights reserved. | Contact: cucyoyo@163.com</p>
+    <p class="footer_p">© 2018 cucyoyo. All rights reserved. </p>
     <p class="footer_p">(网站前端样式参考 <a href="http://www.vicchen.me/">Vic Chen的博客</a>)</p>
       <!--<p class="footer_p">一个技术渣渣</p>-->
   </div>

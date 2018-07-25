@@ -38,7 +38,7 @@
               </router-link>
             </li>
             <li>
-              <router-link :to="{name: 'index', params: { tag:'关于' }}" role="button" aria-haspopup="true" aria-expanded="false">
+              <router-link :to="{name: 'about'}" role="button" aria-haspopup="true" aria-expanded="false">
                 关于
               </router-link>
             </li>
@@ -121,7 +121,7 @@
     /*border-bottom: 1px solid #efefef;*/
     /*color: #999;*/
   }
-  .navbar-brand {
+  #preface {
     color: #3a8ee6;
     font-size: 30px;
     font-family: "Droid Sans";

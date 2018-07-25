@@ -42,6 +42,7 @@
     methods: {
       getData() {
         this.loading = true;
+        console.log(this.$route.params.id)
         this.axios.get('/detail', {
           params: {
             id: this.$route.params.id
@@ -49,8 +50,9 @@
         }).then(res=>{
 //          console.log(res.data);
           this.post = res.data;
-          this.post.html = '<style>img {max-width: 100%}</style>' + this.post.html
+          this.post.html = '<style>.content img {max-width: 70%}</style>' + this.post.html
           this.loading = false;
+          console.log(res.data)
         })
       }
 
