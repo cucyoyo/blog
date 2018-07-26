@@ -38,7 +38,7 @@
   #gotop {
     cursor: pointer;
     position: fixed;
-    right: 80px;
+    right: 40px;
     bottom: 80px;
     span {
       .iconfont {

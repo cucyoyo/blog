@@ -16,14 +16,15 @@ export default new Router({
   routes: [
     { path: '*', name: 'notFound',component: notFound }, //404
     { path: '/', redirect:'/all'}, // 首页
-    { path: '/:tag', name: 'index', component: index }, // 首页
+    { path: '/about', name: 'about', component: about }, // 首页,
     // { path: '/detail/:id', name: 'detail', component: detail }, // 首页
+    { path: '/:tag', name: 'index', component: index }, // 首页
     { path: '/detail/:id', name: 'detail', component: detail }, // 首页
-    { path: '/about', name: 'about', component: about }, // 首页
 
   ],
 
   mode: 'hash',
+  saveScrollPosition: true,
   base: __dirname
 })
 
